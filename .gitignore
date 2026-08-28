@@ -1,0 +1,35 @@
+# Held-out evaluation set: real target forms, hand-filled. Never published.
+# PRD 12.1 -- stays out of any public repo, any prompt, any fine-tuning data.
+samples/heldout/
+
+# Flow-set images are pulled from HuggingFace on demand, not vendored.
+samples/flow/images/
+samples/flow/truth/
+
+# Pipeline working state: page renders, crops, the database.
+data/work/
+data/exports/
+data/inbox/*
+!data/inbox/.gitkeep
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# macOS / OneDrive
+.DS_Store
+Icon?
+
+# External rx100 evaluation set (CC-BY-ND: never redistribute)
+samples/rx100/images/

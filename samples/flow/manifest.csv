@@ -1,0 +1,24 @@
+pair_id,image,truth,num_pages,contributor
+AMR_001,samples/flow/images/AMR_001_HTR.png,samples/flow/truth/AMR_001.txt,1,Amal Pantami
+AMR_003,samples/flow/images/AMR_003_HTR.png,samples/flow/truth/AMR_003.txt,1,Amal Pantami
+AMR_004,samples/flow/images/AMR_004_HTR.png,samples/flow/truth/AMR_004.txt,1,Amal Pantami
+AMR_005,samples/flow/images/AMR_005_HTR.png,samples/flow/truth/AMR_005.txt,1,Arnold Kaura
+AMR_006,samples/flow/images/AMR_006_HTR.png,samples/flow/truth/AMR_006.txt,1,Arnold Kaura
+AMR_007,samples/flow/images/AMR_007_HTR.png,samples/flow/truth/AMR_007.txt,1,Arnold Kaura
+AMR_008,samples/flow/images/AMR_008_HTR.png,samples/flow/truth/AMR_008.txt,1,Arnold Kaura
+AMR_009,samples/flow/images/AMR_009_HTR.png,samples/flow/truth/AMR_009.txt,1,Arnold Kaura
+AMR_010,samples/flow/images/AMR_010_HTR.png,samples/flow/truth/AMR_010.txt,1,Arnold Kaura
+AMR_011,samples/flow/images/AMR_011_HTR.png,samples/flow/truth/AMR_011.txt,1,Arnold Kaura
+AMR_012,samples/flow/images/AMR_012_HTR.png,samples/flow/truth/AMR_012.txt,1,Chukwufumnaya Alekwe
+AMR_014,samples/flow/images/AMR_014_HTR.png,samples/flow/truth/AMR_014.txt,1,Chukwufumnaya Alekwe
+AMR_015,samples/flow/images/AMR_015_HTR.png,samples/flow/truth/AMR_015.txt,1,Chukwufumnaya Alekwe
+AMR_016,samples/flow/images/AMR_016_HTR.png,samples/flow/truth/AMR_016.txt,1,Fatukasi Sarah
+AMR_017,samples/flow/images/AMR_017_HTR.png,samples/flow/truth/AMR_017.txt,1,Fatukasi Sarah
+AMR_019,samples/flow/images/AMR_019_HTR.png,samples/flow/truth/AMR_019.txt,1,Fatukasi Sarah
+AMR_020,samples/flow/images/AMR_020_HTR.png,samples/flow/truth/AMR_020.txt,1,Isaac Peace
+AMR_021,samples/flow/images/AMR_021_HTR.png,samples/flow/truth/AMR_021.txt,1,Isaac Peace
+AMR_022,samples/flow/images/AMR_022_HTR.png,samples/flow/truth/AMR_022.txt,1,Isaac Peace
+AMR_023,samples/flow/images/AMR_023_HTR.png,samples/flow/truth/AMR_023.txt,1,Isaac Peace
+SYN_001,samples/flow/images/SYN_001.png,,1,synthetic
+SYN_002,samples/flow/images/SYN_002.png,,1,synthetic
+SYN_003,samples/flow/images/SYN_003.png,,1,synthetic

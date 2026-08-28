@@ -1,0 +1,1114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>scribe review · workbench</title>
+<style>
+  :root {
+    --bg: #16181d; --panel: #1f232b; --line: #333a45; --text: #e8eaf0;
+    --dim: #9aa3b2; --accent: #6aa1ff; --ok: #4fc37f; --warn: #e2b23c;
+    --bad: #e0604f;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 14px/1.45 -apple-system, "Segoe UI", sans-serif; }
+  header { display: flex; align-items: center; gap: 4px;
+           padding: 8px 16px; border-bottom: 1px solid var(--line); }
+  header h1 { font-size: 15px; margin: 0 16px 0 0; }
+  header .tab { padding: 6px 14px; border-radius: 6px; cursor: pointer;
+                color: var(--dim); border: 1px solid transparent;
+                font-weight: 600; background: none; }
+  header .tab:hover { color: var(--text); }
+  header .tab.active { color: var(--text); background: var(--panel);
+                       border-color: var(--line); }
+  header .tab .badge { background: var(--warn); color: #16181d;
+                       border-radius: 8px; padding: 0 6px; font-size: 11px;
+                       margin-left: 6px; }
+  header .hint { color: var(--dim); font-size: 12px; margin-left: auto; }
+  .view { display: none; height: calc(100vh - 47px); overflow: hidden; }
+  .view.active { display: block; }
+
+  /* shared bits */
+  .card { background: var(--panel); border: 1px solid var(--line);
+          border-radius: 8px; padding: 14px 16px; margin-bottom: 14px; }
+  .card h3 { margin: 0 0 10px; font-size: 13px; text-transform: uppercase;
+             letter-spacing: .06em; color: var(--dim); }
+  select, input[type=text] { background: var(--bg); color: var(--text);
+    border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px;
+    font: 13px inherit; }
+  button { padding: 7px 14px; border-radius: 6px; border: 1px solid var(--line);
+           background: var(--panel); color: var(--text); cursor: pointer;
+           font-weight: 600; }
+  button:hover:not(:disabled) { filter: brightness(1.25); }
+  button:disabled { opacity: .45; cursor: default; }
+  button.primary { border-color: var(--accent); color: var(--accent); }
+  button.danger { border-color: var(--bad); color: var(--bad); }
+  table.grid { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.grid th { text-align: left; color: var(--dim); font-size: 11px;
+    text-transform: uppercase; letter-spacing: .05em; padding: 6px 8px;
+    border-bottom: 1px solid var(--line); position: sticky; top: 0;
+    background: var(--panel); }
+  table.grid td { padding: 6px 8px; border-bottom: 1px solid
+    color-mix(in srgb, var(--line) 45%, transparent); vertical-align: top; }
+  .mono { font: 12px/1.5 ui-monospace, monospace; }
+  .dimtx { color: var(--dim); }
+  .oktx { color: var(--ok); } .warntx { color: var(--warn); }
+  .badtx { color: var(--bad); }
+  #toast { position: fixed; bottom: 16px; left: 50%; z-index: 10;
+           transform: translateX(-50%); background: var(--panel);
+           border: 1px solid var(--line); border-radius: 6px;
+           padding: 8px 16px; opacity: 0; transition: opacity .2s;
+           pointer-events: none; max-width: 70vw; }
+  #toast.show { opacity: 1; }
+
+  /* ingest */
+  #view-ingest { display: none; }
+  #view-ingest.active { display: grid; grid-template-columns: 380px 1fr;
+    gap: 0; }
+  #ingest-left { padding: 16px; border-right: 1px solid var(--line);
+                 overflow-y: auto; }
+  #ingest-right { padding: 16px; overflow-y: auto; }
+  #dropzone { border: 2px dashed var(--line); border-radius: 8px;
+    padding: 28px 12px; text-align: center; color: var(--dim);
+    cursor: pointer; transition: border-color .15s, color .15s; }
+  #dropzone.drag { border-color: var(--accent); color: var(--accent); }
+  .formrow { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+  .formrow > input[type=text] { flex: 1; }
+  label.small { font-size: 12px; color: var(--dim); }
+
+  /* run */
+  #view-run { display: none; }
+  #view-run.active { display: grid; grid-template-columns: 380px 1fr; }
+  #run-left { padding: 16px; border-right: 1px solid var(--line);
+              overflow-y: auto; }
+  #run-right { display: flex; flex-direction: column; overflow: hidden; }
+  .healthrow { display: flex; gap: 8px; align-items: baseline;
+               padding: 4px 0; font-size: 13px; }
+  .healthrow .lamp { width: 9px; height: 9px; border-radius: 50%;
+                     flex: none; align-self: center; }
+  #runbar { padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  #runbar progress { width: 100%; height: 10px; }
+  #runstats { font-size: 12px; color: var(--dim); margin-top: 6px; }
+  #runlog { flex: 1; overflow-y: auto; padding: 10px 16px;
+            font: 12px/1.7 ui-monospace, monospace; }
+  #runlog .ev-field { color: var(--dim); }
+  #runlog .ev-page_done { color: var(--ok); }
+  #runlog .ev-page_started { color: var(--accent); }
+  #runlog .ev-error, #runlog .ev-page_failed { color: var(--bad); }
+  #runlog .ev-run_started, #runlog .ev-run_done { color: var(--text);
+    font-weight: 700; }
+
+  /* results */
+  #view-results { display: none; }
+  #view-results.active { display: grid; grid-template-columns: 1fr 420px; }
+  #res-main { overflow-y: auto; }
+  #res-toolbar { display: flex; gap: 10px; align-items: center;
+    padding: 10px 16px; border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; background: var(--bg); z-index: 2; }
+  #res-table-wrap { padding: 0 16px 16px; }
+  #res-main tr.row { cursor: pointer; }
+  #res-main tr.row:hover td { background: var(--panel); }
+  #res-main tr.row.active td { background: var(--panel);
+    box-shadow: inset 3px 0 0 var(--accent); }
+  #res-side { border-left: 1px solid var(--line); overflow-y: auto;
+              padding: 14px; }
+  #res-side img { max-width: 100%; border-radius: 6px;
+                  border: 1px solid var(--line); cursor: zoom-in; }
+  #res-side img.zoomed { max-width: none; width: 220%; cursor: zoom-out; }
+
+  /* image stack: page + region highlight + row guides */
+  #imgcol { display: flex; flex-direction: column; overflow: hidden;
+            background: #0c0d10; }
+  #imgbar { display: flex; gap: 6px; padding: 6px 10px; align-items: center;
+            border-bottom: 1px solid var(--line); background: var(--bg); }
+  #imgbar button { padding: 3px 12px; font-size: 12px; }
+  #imgbar button.on { border-color: var(--accent); color: var(--accent); }
+  #imgbar .lbl { color: var(--dim); font-size: 12px; margin-left: auto; }
+  /* The stack's box always equals the image's box (width: fit-content), so
+     the %-positioned overlays stay aligned at every zoom level. Zoom widens
+     the stack; the image follows at width 100%. */
+  .imgstack { position: relative; width: fit-content; max-width: 100%;
+              margin: 0 auto; cursor: zoom-in; }
+  .imgstack img { display: block; max-width: 100%; }
+  .imgstack .ovl { position: absolute; inset: 0; overflow: hidden;
+                   pointer-events: none; }
+  .zoomwrap { overflow: auto; flex: 1; }
+  .zoomwrap.zoomed .imgstack { width: 190%; max-width: none;
+                               cursor: zoom-out; margin: 0; }
+  .zoomwrap.zoomed .imgstack img { width: 100%; }
+  .ov-box { position: absolute; border: 2px solid var(--accent);
+            border-radius: 3px; pointer-events: none;
+            box-shadow: 0 0 0 100vmax rgba(8, 9, 12, .55); }
+  .ov-line { position: absolute; left: 0; right: 0; border-top: 1px dashed
+             rgba(106, 161, 255, .55); pointer-events: none; }
+  .ov-rowno { position: absolute; left: 3px; transform: translateY(-50%);
+              background: rgba(22, 24, 29, .8); color: var(--accent);
+              font: 10px ui-monospace, monospace; padding: 0 4px;
+              border-radius: 3px; pointer-events: none; }
+  .ov-rowsel { position: absolute; left: 0; right: 0;
+               border: 2px solid var(--ok); border-radius: 3px;
+               background: rgba(79, 195, 127, .16); pointer-events: none; }
+  .ov-rowsel .tag { position: absolute; right: 4px; top: -1px;
+                    background: var(--ok); color: #16181d;
+                    font: 10px ui-monospace, monospace; padding: 0 5px;
+                    border-radius: 0 0 3px 3px; }
+  #imgbar input.num { width: 52px; background: var(--bg);
+    color: var(--text); border: 1px solid var(--line); border-radius: 6px;
+    padding: 3px 6px; font: 12px inherit; }
+  #focusbar { display: none; gap: 8px; padding: 8px 10px; align-items:
+              center; border-top: 1px solid var(--line);
+              background: var(--bg); }
+  #focusbar.show { display: flex; }
+  #focusbar .rowlbl { color: var(--ok); font: 12px ui-monospace, monospace;
+                      white-space: nowrap; }
+  #focusbar input { flex: 1; background: var(--panel); color: var(--text);
+    border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px;
+    font: 13px ui-monospace, monospace; }
+  #focusbar button { padding: 5px 11px; }
+
+  /* page progress chips */
+  .chips { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0 10px; }
+  .chip { font-size: 11px; padding: 2px 8px; border-radius: 9px;
+          border: 1px solid var(--line); color: var(--dim); }
+  .chip.done { border-color: var(--ok); color: var(--ok); }
+  .chip.flag { border-color: var(--warn); color: var(--warn);
+               cursor: pointer; }
+
+  /* structured table editor */
+  .tbl-edit { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+  .tbl-edit th { font-size: 10px; color: var(--dim);
+                 text-transform: uppercase; letter-spacing: .04em;
+                 padding: 2px 4px; text-align: left; }
+  .tbl-edit td { padding: 1px; }
+  .tbl-edit input { width: 100%; min-width: 52px; background: var(--bg);
+    color: var(--text); border: 1px solid var(--line); border-radius: 4px;
+    padding: 4px 6px; font: 12px ui-monospace, monospace; }
+  .tbl-edit .del { padding: 2px 7px; font-size: 11px;
+                   border-color: var(--bad); color: var(--bad); }
+
+  /* review (original three-pane layout) */
+  #view-review { display: none; }
+  #view-review.active { display: grid;
+    grid-template-columns: 340px 1fr 420px; }
+  #queue { border-right: 1px solid var(--line); overflow-y: auto; }
+  #queue .doc { padding: 6px 12px; color: var(--dim); font-size: 12px;
+                border-top: 1px solid var(--line);
+                position: sticky; top: 0; background: var(--bg); }
+  #queue .item { padding: 8px 12px; cursor: pointer;
+                 border-left: 3px solid transparent; }
+  #queue .item:hover { background: var(--panel); }
+  #queue .item.active { background: var(--panel);
+                        border-left-color: var(--accent); }
+  #queue .item .f { font-weight: 600; }
+  #queue .item .r { color: var(--warn); font-size: 12px; }
+  #queue .empty { padding: 24px; color: var(--dim); }
+  #imgwrap { overflow: auto; background: #0c0d10; position: relative;
+             display: flex; align-items: flex-start; justify-content: center; }
+  #detail { border-left: 1px solid var(--line); overflow-y: auto;
+            padding: 16px; }
+  #detail h2 { font-size: 16px; margin: 0 0 2px; }
+  #detail .meta { color: var(--dim); font-size: 12px; margin-bottom: 12px; }
+  .block { background: var(--panel); border: 1px solid var(--line);
+           border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; }
+  .block .label { font-size: 11px; text-transform: uppercase;
+                  letter-spacing: .06em; color: var(--dim); margin-bottom: 4px; }
+  .block pre { margin: 0; white-space: pre-wrap; word-break: break-word;
+               font: 13px/1.5 ui-monospace, monospace; }
+  .flag { color: var(--warn); }
+  .errors { color: var(--bad); }
+  textarea { width: 100%; min-height: 64px; background: var(--bg);
+             color: var(--text); border: 1px solid var(--line);
+             border-radius: 6px; padding: 8px; font: 13px ui-monospace, monospace; }
+  .btnrow { display: flex; gap: 8px; margin-top: 10px; }
+  .btnrow button { flex: 1; padding: 9px 0; }
+  #b-accept { border-color: var(--ok); color: var(--ok); }
+  #b-correct { border-color: var(--accent); color: var(--accent); }
+  #b-reject { border-color: var(--bad); color: var(--bad); }
+  kbd { background: var(--line); border-radius: 3px; padding: 0 5px;
+        font: 11px ui-monospace, monospace; }
+  #docbar { border-top: 1px solid var(--line); padding: 10px 12px; }
+  #docbar .doc { display: flex; gap: 8px; align-items: center;
+                 padding: 3px 0; font-size: 12px; }
+  #docbar progress { flex: 1; height: 8px; }
+  #docbar button { flex: none; padding: 3px 10px; font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>scribe</h1>
+  <button class="tab active" data-view="ingest">Ingest</button>
+  <button class="tab" data-view="run">Run</button>
+  <button class="tab" data-view="results">Results</button>
+  <button class="tab" data-view="review">Review<span id="queue-badge"
+    class="badge" style="display:none"></span></button>
+  <span class="hint" id="tabhint"></span>
+</header>
+
+<!-- ======================= INGEST ======================= -->
+<div id="view-ingest" class="view active">
+  <div id="ingest-left">
+    <div class="card">
+      <h3>Schema</h3>
+      <select id="schema-select" style="width:100%"></select>
+      <div class="dimtx" style="font-size:12px;margin-top:6px">
+        Bound at ingest; drives which fields are extracted.</div>
+    </div>
+    <div class="card">
+      <h3>Upload files</h3>
+      <div id="dropzone">Drop images / PDFs / HEIC here<br>or click to
+        browse</div>
+      <input type="file" id="fileinput" multiple hidden
+             accept=".png,.jpg,.jpeg,.tif,.tiff,.webp,.bmp,.pdf,.heic,.heif">
+    </div>
+    <div class="card">
+      <h3>Ingest a folder on this machine</h3>
+      <div class="formrow">
+        <input type="text" id="pathinput"
+               placeholder="/path/to/folder or file">
+        <button id="ingest-path-btn" class="primary">Ingest</button>
+      </div>
+    </div>
+    <div class="card" id="ingest-report" style="display:none">
+      <h3>Last ingest</h3>
+      <div id="ingest-report-body" class="mono"></div>
+    </div>
+  </div>
+  <div id="ingest-right">
+    <div class="card">
+      <h3>Documents</h3>
+      <table class="grid" id="docs-table">
+        <thead><tr><th>source</th><th>doc id</th><th>pages</th>
+          <th>schema</th><th>status</th><th>extracted</th><th>flags</th>
+          <th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= RUN ======================= -->
+<div id="view-run" class="view">
+  <div id="run-left">
+    <div class="card">
+      <h3>Engines <button id="health-btn" style="float:right;padding:2px 10px;
+        font-size:12px">check</button></h3>
+      <div id="health-body" class="dimtx">not checked yet</div>
+    </div>
+    <div class="card">
+      <h3>Start a run</h3>
+      <select id="run-doc-select" style="width:100%"></select>
+      <div class="formrow">
+        <button id="run-btn" class="primary" style="flex:1">Start
+          extraction</button>
+      </div>
+      <div class="dimtx" style="font-size:12px;margin-top:8px">
+        Resumable: pages already extracted under the current prompt version
+        are skipped.</div>
+    </div>
+  </div>
+  <div id="run-right">
+    <div id="runbar">
+      <progress id="run-progress" max="1" value="0"></progress>
+      <div id="runstats">idle</div>
+    </div>
+    <div id="runlog"><span class="dimtx">No run yet. Check engines, then
+      start one.</span></div>
+  </div>
+</div>
+
+<!-- ======================= RESULTS ======================= -->
+<div id="view-results" class="view">
+  <div id="res-main">
+    <div id="res-toolbar">
+      <label class="small">document</label>
+      <select id="res-doc-select"></select>
+      <span id="res-summary" class="dimtx" style="font-size:12px"></span>
+    </div>
+    <div id="res-table-wrap">
+      <table class="grid" id="res-table">
+        <thead><tr><th>p</th><th>field</th><th>value</th><th>conf</th>
+          <th>status</th><th>review</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  <div id="res-side"><div class="dimtx" style="padding:10px">Select a row to
+    see the model's evidence.</div></div>
+</div>
+
+<!-- ======================= REVIEW ======================= -->
+<div id="view-review" class="view">
+  <div id="queue"></div>
+  <div id="imgcol">
+    <div id="imgbar">
+      <button id="b-context" class="on" onclick="setView('context')">Context</button>
+      <button id="b-crop" onclick="setView('crop')">Crop</button>
+      <button id="b-guides" onclick="toggleGuides()">Guides (g)</button>
+      <span id="mapctl" style="display:none;align-items:center;gap:5px">
+        <span class="lbl" style="margin-left:0">row 1 at line</span>
+        <input class="num" id="map-start" type="number" min="1" value="1"
+               onchange="mapChanged()">
+        <button id="map-stride" onclick="toggleStride()">2 lines/row</button>
+      </span>
+      <button onclick="$('#imgwrap').classList.toggle('zoomed')">Zoom (z)</button>
+      <span class="lbl" id="imglbl"></span>
+    </div>
+    <div class="zoomwrap" id="imgwrap">
+      <div class="imgstack" id="imgstack">
+        <img id="pageimg" alt="">
+        <div id="ovl" class="ovl"></div>
+      </div>
+    </div>
+    <div id="focusbar">
+      <button onclick="stepRow(-1)" title="previous row">↑</button>
+      <button onclick="stepRow(1)" title="next row">↓</button>
+      <span class="rowlbl" id="focuslbl"></span>
+      <input id="focustext" placeholder="click a table row (or the image) to focus it">
+    </div>
+  </div>
+  <div id="detail"><div class="empty" style="color:var(--dim);padding:24px">
+    Select a flagged field.</div></div>
+</div>
+
+<div id="toast"></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g,
+  c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt = v => v === null || v === undefined
+  ? 'null' : (typeof v === 'object' ? JSON.stringify(v, null, 2) : String(v));
+const fmt1 = v => v === null || v === undefined
+  ? 'null' : (typeof v === 'object' ? JSON.stringify(v) : String(v));
+
+function toast(msg, ms = 2200) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), ms);
+}
+
+/* ---------------- tabs ---------------- */
+const HINTS = {
+  ingest: 'upload or point at a folder · HEIC converts automatically',
+  run: 'start `scribe serve` in a terminal first',
+  results: 'every extracted field, flagged or not',
+  review: 'j/k next/prev · a accept · c correct · r reject · z zoom',
+};
+let activeView = 'ingest';
+document.querySelectorAll('header .tab').forEach(b => b.onclick = () => {
+  activeView = b.dataset.view;
+  document.querySelectorAll('header .tab').forEach(x =>
+    x.classList.toggle('active', x === b));
+  document.querySelectorAll('.view').forEach(v =>
+    v.classList.toggle('active', v.id === 'view-' + activeView));
+  $('#tabhint').textContent = HINTS[activeView];
+  if (activeView === 'ingest') refreshDocs();
+  if (activeView === 'run') { refreshRunDocs(); pollRun(true); }
+  if (activeView === 'results') refreshResultsDocs();
+  if (activeView === 'review') loadQueue();
+});
+$('#tabhint').textContent = HINTS.ingest;
+
+/* ---------------- ingest ---------------- */
+async function loadSchemas() {
+  const schemas = await (await fetch('/api/schemas')).json();
+  $('#schema-select').innerHTML = schemas.map(s =>
+    `<option value="${esc(s.schema_id)}">${esc(s.schema_id)} v${s.version}
+     (${s.n_fields} fields)</option>`).join('')
+    || '<option value="">no schemas found</option>';
+}
+
+function ingestReport(r) {
+  const lines = [];
+  if (r.ingested.length) lines.push(
+    `<span class="oktx">+ ${r.ingested.length} ingested</span>`);
+  r.duplicates.forEach(d => lines.push(
+    `<span class="dimtx">= duplicate: ${esc(d)}</span>`));
+  r.unsupported.forEach(d => lines.push(
+    `<span class="warntx">? unsupported: ${esc(d)}</span>`));
+  r.failed.forEach(f => lines.push(
+    `<span class="badtx">! ${esc(f.file)}: ${esc(f.error)}</span>`));
+  $('#ingest-report').style.display = '';
+  $('#ingest-report-body').innerHTML = lines.join('<br>') ||
+    '<span class="dimtx">nothing to do</span>';
+  refreshDocs();
+}
+
+async function uploadFiles(fileList) {
+  const fd = new FormData();
+  for (const f of fileList) fd.append('files', f);
+  const sid = $('#schema-select').value;
+  if (sid) fd.append('schema_id', sid);
+  toast(`uploading ${fileList.length} file(s)… (HEIC conversion can take
+    a few seconds each)`, 60000);
+  const r = await fetch('/api/upload', { method: 'POST', body: fd });
+  if (!r.ok) { toast((await r.json()).detail, 4000); return; }
+  toast('ingest finished');
+  ingestReport(await r.json());
+}
+
+const dz = $('#dropzone');
+dz.onclick = () => $('#fileinput').click();
+$('#fileinput').onchange = e => { if (e.target.files.length)
+  uploadFiles(e.target.files); e.target.value = ''; };
+dz.ondragover = e => { e.preventDefault(); dz.classList.add('drag'); };
+dz.ondragleave = () => dz.classList.remove('drag');
+dz.ondrop = e => { e.preventDefault(); dz.classList.remove('drag');
+  if (e.dataTransfer.files.length) uploadFiles(e.dataTransfer.files); };
+
+$('#ingest-path-btn').onclick = async () => {
+  const path = $('#pathinput').value.trim();
+  if (!path) { toast('enter a path'); return; }
+  toast('ingesting…', 60000);
+  const r = await fetch('/api/ingest', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path, schema_id: $('#schema-select').value || null }) });
+  if (!r.ok) { toast((await r.json()).detail, 4000); return; }
+  toast('ingest finished');
+  ingestReport(await r.json());
+};
+
+async function fetchDocs() { return (await fetch('/api/docs')).json(); }
+
+async function refreshDocs() {
+  const docs = await fetchDocs();
+  const totalFlags = docs.reduce((a, d) => a + (d.unresolved || 0), 0);
+  const badge = $('#queue-badge');
+  badge.style.display = totalFlags ? '' : 'none';
+  badge.textContent = totalFlags;
+  $('#docs-table tbody').innerHTML = docs.map(d => `
+    <tr><td>${esc(d.source_name)}</td>
+      <td class="mono">${esc(d.doc_id)}</td>
+      <td>${d.page_count}</td>
+      <td class="dimtx">${esc(d.schema_id || '—')}</td>
+      <td class="${d.status === 'finalized' ? 'oktx' : 'dimtx'}">
+        ${esc(d.status)}</td>
+      <td>${d.n_extractions || 0}</td>
+      <td class="${d.unresolved ? 'warntx' : 'dimtx'}">
+        ${d.unresolved || 0} open</td>
+      <td><button class="danger" style="padding:2px 10px;font-size:12px"
+        onclick="purgeDoc('${d.doc_id}')">purge</button></td></tr>`).join('')
+    || '<tr><td colspan="8" class="dimtx">nothing ingested yet</td></tr>';
+}
+
+async function purgeDoc(docId) {
+  if (!confirm(`Purge ${docId}? Removes DB rows, page images and crops.`))
+    return;
+  const r = await fetch('/api/purge/' + docId, { method: 'POST' });
+  toast(r.ok ? 'purged ' + docId : (await r.json()).detail, 3000);
+  refreshDocs();
+}
+
+/* ---------------- run ---------------- */
+function lamp(ok) {
+  return `<span class="lamp" style="background:${ok ? 'var(--ok)'
+    : 'var(--bad)'}"></span>`;
+}
+
+$('#health-btn').onclick = async () => {
+  $('#health-body').textContent = 'probing…';
+  const h = await (await fetch('/api/health')).json();
+  const row = (label, e) => e === null
+    ? `<div class="healthrow"><span class="lamp"
+        style="background:var(--line)"></span>
+        <b>${label}</b><span class="dimtx">not configured</span></div>`
+    : `<div class="healthrow">${lamp(e.ok)}<b>${label}</b>
+        <span class="${e.ok ? '' : 'badtx'}" style="overflow-wrap:anywhere">
+        ${esc(e.model || e.name || '')} · ${esc(e.detail || '')}
+        ${e.latency_ms ? '· ' + Math.round(e.latency_ms) + 'ms' : ''}
+        </span></div>`;
+  $('#health-body').innerHTML = row('extraction', h.extraction)
+    + row('verify', h.verify) + row('layout', h.layout);
+};
+
+async function refreshRunDocs() {
+  const docs = await fetchDocs();
+  const pending = docs.filter(d => d.status !== 'finalized');
+  $('#run-doc-select').innerHTML =
+    '<option value="">All pending documents</option>' +
+    pending.map(d => `<option value="${d.doc_id}">
+      ${esc(d.source_name)} (${d.page_count}p, ${esc(d.status)})
+      </option>`).join('');
+}
+
+let runPollTimer = null, runSince = 0, runWasRunning = false;
+
+$('#run-btn').onclick = async () => {
+  const doc_id = $('#run-doc-select').value || null;
+  const r = await fetch('/api/run', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ doc_id }) });
+  if (!r.ok) { toast((await r.json()).detail, 3500); return; }
+  $('#runlog').innerHTML = '';
+  runSince = 0;
+  pollRun(true);
+};
+
+function evLine(e) {
+  const t = e.ts.slice(11, 19);
+  let msg;
+  switch (e.kind) {
+    case 'run_started':
+      msg = `run started · ${e.pages} page(s) · model ${e.model}` +
+        (e.verify ? ` · verify ${e.verify}` : '') +
+        (e.layout && e.layout !== 'none' ? ` · layout ${e.layout}` : '');
+      break;
+    case 'phase': msg = e.message; break;
+    case 'page_started': msg = `▶ ${e.doc_id} p${e.page_no}`; break;
+    case 'field': msg = `   ${e.field} …`; break;
+    case 'page_done':
+      msg = `✓ ${e.doc_id} p${e.page_no}: ${e.n_fields} fields in ` +
+        `${e.seconds}s, ${e.flagged} flagged`;
+      break;
+    case 'page_failed':
+      msg = `✗ ${e.doc_id} p${e.page_no}: ${e.message}`; break;
+    case 'error': msg = `error: ${e.message}`; break;
+    case 'run_done':
+      const c = e.counters;
+      msg = `run finished · ${c.pages_done}/${c.pages_total} pages · ` +
+        `${c.fields_done} fields · ${c.flagged} in review queue` +
+        (c.failures ? ` · ${c.failures} failures` : '');
+      break;
+    default: msg = e.kind;
+  }
+  return `<div class="ev-${esc(e.kind)}"><span class="dimtx">${t}</span> ` +
+    `${esc(msg)}</div>`;
+}
+
+async function pollRun(immediate = false) {
+  clearTimeout(runPollTimer);
+  let s;
+  try {
+    s = await (await fetch('/api/run/status?since=' + runSince)).json();
+  } catch { runPollTimer = setTimeout(pollRun, 2000); return; }
+  if (runSince === 0 && s.n_events) $('#runlog').innerHTML = '';
+  if (s.events.length) {
+    const log = $('#runlog');
+    const stick = log.scrollTop + log.clientHeight >= log.scrollHeight - 40;
+    log.insertAdjacentHTML('beforeend', s.events.map(evLine).join(''));
+    if (stick) log.scrollTop = log.scrollHeight;
+    runSince = s.n_events;
+  }
+  const c = s.counters || {};
+  if (c.pages_total) {
+    $('#run-progress').value = c.pages_done / c.pages_total;
+    $('#runstats').textContent =
+      `${c.pages_done}/${c.pages_total} pages · ${c.fields_done} fields` +
+      ` · ${c.flagged} flagged` +
+      (c.failures ? ` · ${c.failures} failures` : '') +
+      (s.running ? '' : ' · done');
+  } else if (!s.running) {
+    $('#runstats').textContent = 'idle';
+  }
+  if (runWasRunning && !s.running) { refreshDocs(); loadQueueCount(); }
+  runWasRunning = s.running;
+  if (s.running || immediate)
+    runPollTimer = setTimeout(pollRun, s.running ? 1000 : 3000);
+}
+
+/* ---------------- results ---------------- */
+let resRows = [], resActive = null;
+
+async function refreshResultsDocs() {
+  const docs = (await fetchDocs()).filter(d => d.n_extractions > 0);
+  const sel = $('#res-doc-select');
+  const prev = sel.value;
+  sel.innerHTML = docs.map(d => `<option value="${d.doc_id}">
+    ${esc(d.source_name)} (${d.n_extractions})</option>`).join('')
+    || '<option value="">no extractions yet</option>';
+  if ([...sel.options].some(o => o.value === prev)) sel.value = prev;
+  if (sel.value) loadResults(sel.value);
+  else { $('#res-table tbody').innerHTML = ''; $('#res-summary').textContent = ''; }
+}
+$('#res-doc-select').onchange = e => loadResults(e.target.value);
+
+async function loadResults(docId) {
+  if (!docId) return;
+  resRows = await (await fetch('/api/extractions?doc=' + docId)).json();
+  const flagged = resRows.filter(r => r.flagged).length;
+  const reviewed = resRows.filter(r => r.review_action).length;
+  $('#res-summary').textContent =
+    `${resRows.length} fields · ${flagged} flagged · ` +
+    `${reviewed} reviewed`;
+  $('#res-table tbody').innerHTML = resRows.map((r, i) => {
+    const st = r.flagged
+      ? `<span class="warntx">⚑ ${esc(r.flag_reason || 'flagged')}</span>`
+      : (r.validation_status === 'pass'
+        ? '<span class="oktx">pass</span>'
+        : `<span class="dimtx">${esc(r.validation_status)}</span>`);
+    const rev = r.review_action
+      ? `<span class="${r.review_action === 'reject' ? 'badtx' : 'oktx'}">
+          ${esc(r.review_action)}</span>`
+      : '<span class="dimtx">—</span>';
+    const v = fmt1(r.value);
+    return `<tr class="row" data-i="${i}"><td>${r.page_no}</td>
+      <td><b>${esc(r.field_name)}</b></td>
+      <td class="mono">${esc(v.length > 90 ? v.slice(0, 90) + '…' : v)}
+      </td>
+      <td>${r.composite_confidence?.toFixed(2) ?? '—'}</td>
+      <td style="max-width:260px">${st}</td><td>${rev}</td></tr>`;
+  }).join('');
+  document.querySelectorAll('#res-main tr.row').forEach(tr =>
+    tr.onclick = () => showResult(+tr.dataset.i));
+  $('#res-side').innerHTML = '<div class="dimtx" style="padding:10px">Select' +
+    ' a row to see the model’s evidence.</div>';
+}
+
+function showResult(i) {
+  resActive = i;
+  document.querySelectorAll('#res-main tr.row').forEach(tr =>
+    tr.classList.toggle('active', +tr.dataset.i === i));
+  const r = resRows[i];
+  const image = (r.bbox && r.width_px)
+    ? `<div class="imgstack"
+         onclick="this.querySelector('img').classList.toggle('zoomed')">
+         <img src="/api/page-image/${r.page_id}" alt="">
+         <div class="ovl">${overlayHTML(r, 'context', [])}</div></div>
+       <div class="dimtx" style="font-size:11px;margin-top:4px">
+         highlighted: the region this value was read from · click to zoom</div>`
+    : `<img src="/api/crop/${r.extraction_id}" alt=""
+        onclick="this.classList.toggle('zoomed')">`;
+  $('#res-side').innerHTML = `
+    <h2 style="font-size:15px;margin:0 0 8px">${esc(r.field_name)}
+      <span class="dimtx" style="font-weight:400">p${r.page_no}</span></h2>
+    ${image}
+    <div class="block" style="margin-top:10px">
+      <div class="label">raw transcription</div>
+      <pre>${esc(fmt(r.raw_transcription))}</pre></div>
+    <div class="block"><div class="label">value</div>
+      <pre>${esc(fmt(r.value))}</pre></div>
+    ${r.note ? `<div class="block"><div class="label">model note</div>
+      <pre>${esc(r.note)}</pre></div>` : ''}
+    ${r.flag_reason ? `<div class="block"><div class="label">flag</div>
+      <pre class="flag">${esc(r.flag_reason)}</pre></div>` : ''}
+    <div class="dimtx" style="font-size:12px">
+      confidence ${r.composite_confidence?.toFixed(2) ?? '—'} ·
+      ${r.latency_ms ?? '?'} ms · ${esc(r.validation_status)}</div>`;
+}
+
+/* ---------------- review (original UI) ---------------- */
+let queue = [], idx = -1, current = null;
+
+async function loadQueueCount() {
+  const q = await (await fetch('/api/queue')).json();
+  const badge = $('#queue-badge');
+  badge.style.display = q.length ? '' : 'none';
+  badge.textContent = q.length;
+}
+
+async function loadQueue(keepIdx = false) {
+  queue = await (await fetch('/api/queue')).json();
+  const badge = $('#queue-badge');
+  badge.style.display = queue.length ? '' : 'none';
+  badge.textContent = queue.length;
+  const el = $('#queue');
+  if (!queue.length) {
+    el.innerHTML = '<div class="empty">Queue is empty.</div>' + docbarHTML;
+    renderDocs();
+    $('#detail').innerHTML =
+      '<div style="color:var(--dim);padding:24px">All flags resolved. ' +
+      'Finalize documents below-left, then run <code>scribe export</code>.</div>';
+    $('#pageimg').src = '';
+    return;
+  }
+  let html = '', lastDoc = null;
+  queue.forEach((q, i) => {
+    if (q.doc_id !== lastDoc) {
+      html += `<div class="doc">${esc(q.doc_id)} · p${q.page_no}</div>`;
+      lastDoc = q.doc_id;
+    }
+    html += `<div class="item" data-i="${i}">
+      <div class="f">${esc(q.field_name)}</div>
+      <div class="r">${esc(q.flag_reason || '')}</div></div>`;
+  });
+  el.innerHTML = html + docbarHTML;
+  renderDocs();
+  el.querySelectorAll('.item').forEach(n =>
+    n.onclick = () => select(+n.dataset.i));
+  if (!keepIdx || idx >= queue.length) idx = 0;
+  select(Math.max(0, Math.min(idx, queue.length - 1)));
+}
+
+const docbarHTML = '<div id="docbar"></div>';
+
+async function renderDocs() {
+  const docs = await fetchDocs();
+  const bar = $('#docbar'); if (!bar) return;
+  bar.innerHTML = docs.map(d => {
+    const done = (d.n_flagged || 0) - d.unresolved;
+    const pct = d.n_flagged ? done / d.n_flagged : 1;
+    const fin = d.status === 'finalized';
+    return `<div class="doc"><span style="width:150px;overflow:hidden;
+      text-overflow:ellipsis;white-space:nowrap">${esc(d.source_name)}</span>
+      <progress max="1" value="${pct}"></progress>
+      ${fin ? '<span style="color:var(--ok)">finalized</span>'
+            : `<button ${d.unresolved ? 'disabled' : ''}
+                 onclick="finalizeDoc('${d.doc_id}')">finalize</button>`}
+    </div>`;
+  }).join('');
+}
+
+async function finalizeDoc(docId) {
+  const r = await fetch('/api/finalize/' + docId, { method: 'POST' });
+  if (r.ok) { toast('finalized ' + docId); renderDocs(); refreshDocs(); }
+  else toast((await r.json()).detail, 3500);
+}
+
+/* -- image stack: context/crop toggle, bbox highlight, row guides ------- */
+let imgView = 'context', guidesOn = false;
+const guideCache = {};
+
+function setView(v) {
+  imgView = v;
+  renderStack();
+}
+
+async function toggleGuides() {
+  guidesOn = !guidesOn;
+  if (guidesOn && current && !(current.extraction_id in guideCache)) {
+    const r = await fetch('/api/row-guides/' + current.extraction_id);
+    guideCache[current.extraction_id] = r.ok ? (await r.json()).ys : [];
+    if (!guideCache[current.extraction_id].length)
+      toast('no ruled lines detected on this image');
+  }
+  renderStack();
+}
+
+function overlayHTML(c, view, guides) {
+  let html = '';
+  if (view === 'context' && c.bbox && c.width_px && c.height_px) {
+    const [x0, y0, x1, y1] = c.bbox;
+    html += `<div class="ov-box" style="left:${(x0 / c.width_px * 100)}%;
+      top:${(y0 / c.height_px * 100)}%;
+      width:${((x1 - x0) / c.width_px * 100)}%;
+      height:${((y1 - y0) / c.height_px * 100)}%"></div>`;
+  }
+  if (guides && guides.length) {
+    guides.forEach(y => {
+      html += `<div class="ov-line" style="top:${y * 100}%"></div>`; });
+    for (let i = 0; i + 1 < guides.length; i++) {
+      const mid = (guides[i] + guides[i + 1]) / 2;
+      html += `<div class="ov-rowno" style="top:${mid * 100}%">${i + 1}</div>`;
+    }
+  }
+  return html;
+}
+
+function renderStack() {
+  if (!current) return;
+  const c = current;
+  const hasRegion = !!c.bbox;
+  // With a located region, "context" = full page + highlight, "crop" = the
+  // crop image alone. Without one, the crop endpoint already serves the
+  // page/band image and there is nothing to toggle.
+  $('#b-context').classList.toggle('on', imgView === 'context');
+  $('#b-crop').classList.toggle('on', imgView === 'crop');
+  $('#b-crop').disabled = !hasRegion;
+  $('#b-guides').classList.toggle('on', guidesOn);
+  const src = (hasRegion && imgView === 'context')
+    ? '/api/page-image/' + c.page_id
+    : '/api/crop/' + c.extraction_id;
+  const img = $('#pageimg');
+  if (img.getAttribute('src') !== src) img.src = src;
+  // Guides are measured on the crop image; only draw them on that view.
+  const guides = (guidesOn && !(hasRegion && imgView === 'context'))
+    ? (guideCache[c.extraction_id] || []) : [];
+  $('#ovl').innerHTML = overlayHTML(c, hasRegion ? imgView : 'plain', guides);
+  $('#imglbl').textContent = hasRegion
+    ? (imgView === 'context' ? 'region highlighted on page' : 'crop only')
+    : 'whole band/page (no located region)';
+  $('#mapctl').style.display =
+    (current.field_def?.type === 'table' && mapGuides().length) ? 'flex' : 'none';
+  updateRowHighlight();
+}
+
+/* -- row <-> image strip mapping ---------------------------------------- */
+// One nudge of "row 1 at line N" aligns a whole band; remembered per
+// extraction, and the last used mapping seeds the next band (they repeat).
+const mapState = {};
+let lastMap = { start: 1, stride: 2 };
+let focusedRowIdx = -1, focusedInput = null;
+
+function mapGuides() {
+  return current ? (guideCache[current.extraction_id] || []) : [];
+}
+
+function curMap() {
+  if (!current) return lastMap;
+  if (!mapState[current.extraction_id])
+    mapState[current.extraction_id] = { ...lastMap };
+  return mapState[current.extraction_id];
+}
+
+function mapChanged() {
+  const m = curMap();
+  m.start = Math.max(1, parseInt($('#map-start').value, 10) || 1);
+  lastMap = { ...m };
+  updateRowHighlight();
+}
+
+function toggleStride() {
+  const m = curMap();
+  m.stride = m.stride === 2 ? 1 : 2;
+  lastMap = { ...m };
+  $('#map-stride').textContent = m.stride + ' lines/row';
+  updateRowHighlight();
+}
+
+function rowBounds(i) {           // i: 0-based editor row -> [y0, y1] fracs
+  const g = mapGuides();
+  if (!g.length) return null;
+  const m = curMap();
+  const top = m.start - 1 + i * m.stride;
+  const bot = Math.min(top + m.stride, g.length - 1);
+  if (top >= g.length - 1) return null;
+  return [g[top], g[bot]];
+}
+
+function updateRowHighlight() {
+  document.querySelectorAll('.ov-rowsel').forEach(n => n.remove());
+  if (focusedRowIdx < 0 || current?.field_def?.type !== 'table') return;
+  const b = rowBounds(focusedRowIdx);
+  if (!b) return;
+  $('#ovl').insertAdjacentHTML('beforeend',
+    `<div class="ov-rowsel" style="top:${b[0] * 100}%;
+       height:${(b[1] - b[0]) * 100}%">
+       <span class="tag">row ${focusedRowIdx + 1}</span></div>`);
+  const wrap = $('#imgwrap'), stack = $('#imgstack');
+  const mid = (b[0] + b[1]) / 2 * stack.offsetHeight;
+  const target = mid - wrap.clientHeight / 2;
+  if (Math.abs(wrap.scrollTop - target) > wrap.clientHeight / 4)
+    wrap.scrollTo({ top: target, behavior: 'smooth' });
+}
+
+function syncFocusBar() {
+  const bar = $('#focusbar');
+  if (focusedRowIdx < 0 || !focusedInput) {
+    bar.classList.remove('show');
+    return;
+  }
+  bar.classList.add('show');
+  $('#focuslbl').textContent =
+    `row ${focusedRowIdx + 1} · ${focusedInput.dataset.col}`;
+  $('#focustext').value = focusedInput.value;
+}
+
+function stepRow(d) {
+  const rows = [...document.querySelectorAll('#tbl-edit tbody tr')];
+  const next = focusedRowIdx + d;
+  if (next < 0 || next >= rows.length) return;
+  const col = focusedInput?.dataset.col;
+  const inp = rows[next].querySelector(`input[data-col="${col}"]`)
+    || rows[next].querySelector('input');
+  inp?.focus();
+}
+
+document.addEventListener('focusin', e => {
+  const tr = e.target.closest?.('#tbl-edit tbody tr');
+  if (!tr || e.target.tagName !== 'INPUT') return;
+  focusedInput = e.target;
+  focusedRowIdx = [...tr.parentElement.children].indexOf(tr);
+  updateRowHighlight();
+  syncFocusBar();
+});
+document.addEventListener('input', e => {
+  if (e.target === focusedInput) $('#focustext').value = e.target.value;
+});
+$('#focustext').addEventListener('input', e => {
+  if (focusedInput) focusedInput.value = e.target.value;
+});
+$('#focustext').addEventListener('keydown', e => {
+  if (e.key === 'ArrowUp') { e.preventDefault(); stepRow(-1); $('#focustext').focus(); }
+  else if (e.key === 'ArrowDown') { e.preventDefault(); stepRow(1); $('#focustext').focus(); }
+});
+
+$('#imgstack').addEventListener('click', e => {
+  // For table fields with guides, a click on the image selects the ledger
+  // row under the cursor; otherwise it toggles zoom.
+  if (current?.field_def?.type === 'table' && mapGuides().length) {
+    const rect = $('#imgstack').getBoundingClientRect();
+    const frac = (e.clientY - rect.top) / rect.height;
+    const rows = document.querySelectorAll('#tbl-edit tbody tr').length;
+    for (let i = 0; i < rows; i++) {
+      const b = rowBounds(i);
+      if (b && frac >= b[0] && frac <= b[1]) {
+        const col = focusedInput?.dataset.col;
+        const tr = document.querySelectorAll('#tbl-edit tbody tr')[i];
+        (tr.querySelector(`input[data-col="${col}"]`)
+          || tr.querySelector('input'))?.focus();
+        return;
+      }
+    }
+    toast('no mapped row here -- adjust "row 1 at line" to align');
+    return;
+  }
+  $('#imgwrap').classList.toggle('zoomed');
+});
+
+/* -- page progress chips -------------------------------------------------- */
+async function chipsHTML(pageId) {
+  const fields = await (await fetch('/api/page-fields/' + pageId)).json();
+  return '<div class="chips">' + fields.map(f => {
+    const qi = queue.findIndex(q => q.extraction_id === f.extraction_id);
+    if (f.review_action)
+      return `<span class="chip done" title="${esc(f.review_action)}">✓
+        ${esc(f.field_name)}</span>`;
+    if (f.flagged)
+      return `<span class="chip flag" ${qi >= 0
+        ? `onclick="select(${qi})"` : ''}>⚑ ${esc(f.field_name)}</span>`;
+    return `<span class="chip">${esc(f.field_name)}</span>`;
+  }).join('') + '</div>';
+}
+
+/* -- table editor ---------------------------------------------------------- */
+function tableEditorHTML(fieldDef, value) {
+  const cols = (fieldDef.columns || []).map(c => c.name);
+  const rows = Array.isArray(value) ? value : [];
+  const cell = (r, cn) => `<td><input data-col="${esc(cn)}"
+    value="${esc(r?.[cn] ?? '')}"></td>`;
+  const rowHTML = r => `<tr>${cols.map(cn => cell(r, cn)).join('')}
+    <td><button class="del" tabindex="-1"
+      onclick="this.closest('tr').remove()">×</button></td></tr>`;
+  window._addTableRow = () => $('#tbl-edit tbody')
+    .insertAdjacentHTML('beforeend', rowHTML(null));
+  return `<table class="tbl-edit" id="tbl-edit">
+    <thead><tr>${cols.map(c => `<th>${esc(c)}</th>`).join('')}<th></th></tr>
+    </thead><tbody>${rows.map(rowHTML).join('')}</tbody></table>
+    <button style="padding:3px 12px;font-size:12px"
+      onclick="_addTableRow()">+ row</button>`;
+}
+
+function tableEditorValue(fieldDef) {
+  const types = Object.fromEntries(
+    (fieldDef.columns || []).map(c => [c.name, c.type || 'string']));
+  const rows = [];
+  document.querySelectorAll('#tbl-edit tbody tr').forEach(tr => {
+    const row = {};
+    let any = false;
+    tr.querySelectorAll('input').forEach(inp => {
+      const t = inp.value.trim();
+      const ty = types[inp.dataset.col];
+      row[inp.dataset.col] = t === '' ? null
+        : ty === 'integer' ? (isNaN(parseInt(t, 10)) ? t : parseInt(t, 10))
+        : ty === 'number' ? (isNaN(parseFloat(t)) ? t : parseFloat(t))
+        : t;
+      if (t !== '') any = true;
+    });
+    if (any) rows.push(row);
+  });
+  return rows;
+}
+
+/* -- selection + actions --------------------------------------------------- */
+async function select(i) {
+  if (i < 0 || i >= queue.length) return;
+  idx = i;
+  document.querySelectorAll('#queue .item').forEach(n =>
+    n.classList.toggle('active', +n.dataset.i === i));
+  const q = queue[i];
+  current = await (await fetch('/api/item/' + q.extraction_id)).json();
+  imgView = 'context';
+  const isTable = current.field_def?.type === 'table';
+  if (isTable && !(current.extraction_id in guideCache) && !guidesOn)
+    guidesOn = true;      // tables are the row-counting case
+  if (guidesOn && !(current.extraction_id in guideCache)) {
+    const r = await fetch('/api/row-guides/' + current.extraction_id);
+    guideCache[current.extraction_id] = r.ok ? (await r.json()).ys : [];
+  }
+  $('#imgwrap').classList.remove('zoomed');
+  focusedRowIdx = -1;
+  focusedInput = null;
+  syncFocusBar();
+  const m = curMap();
+  $('#map-start').value = m.start;
+  $('#map-stride').textContent = m.stride + ' lines/row';
+  renderStack();
+
+  const c = current;
+  const errs = (c.validation_errors || []).map(esc).join('<br>');
+  const correction = isTable
+    ? `<div class="label">correction (edit rows directly)</div>
+       ${tableEditorHTML(c.field_def, c.value)}`
+    : `<div class="label">correction
+        (JSON for numbers/lists, plain text for strings)</div>
+      <textarea id="fix" placeholder="corrected value"></textarea>`;
+  $('#detail').innerHTML = `
+    <h2>${esc(c.field_name)}</h2>
+    <div class="meta">${esc(c.doc_id)} · page ${c.page_no} ·
+      model conf ${c.model_confidence ?? '-'} ·
+      composite ${c.composite_confidence?.toFixed(2) ?? '-'}</div>
+    <div id="chips-slot"></div>
+    <div class="block"><div class="label">flag reason</div>
+      <pre class="flag">${esc(c.flag_reason || '')}</pre></div>
+    ${errs ? `<div class="block"><div class="label">validation errors</div>
+      <pre class="errors">${errs}</pre></div>` : ''}
+    <div class="block"><div class="label">raw transcription (what the model read)</div>
+      <pre>${esc(fmt(c.raw_transcription))}</pre></div>
+    ${isTable ? '' : `<div class="block">
+      <div class="label">value (how it interpreted it)</div>
+      <pre>${esc(fmt(c.value))}</pre></div>`}
+    ${c.note ? `<div class="block"><div class="label">model note</div>
+      <pre>${esc(c.note)}</pre></div>` : ''}
+    <div class="block">${correction}
+      <div class="btnrow">
+        <button id="b-accept" onclick="act('accept')">Accept (a)</button>
+        <button id="b-correct" onclick="act('correct')">Correct (c)</button>
+        <button id="b-reject" onclick="act('reject')">Reject (r)</button>
+      </div></div>`;
+  chipsHTML(c.page_id).then(h => {
+    const slot = $('#chips-slot');
+    if (slot && current === c) slot.innerHTML = h;
+  });
+}
+
+function parseCorrection(text, fieldDef) {
+  const t = text.trim();
+  if (!t) return undefined;
+  const ty = fieldDef?.type;
+  if (ty === 'string' || ty === 'free_text' || ty === 'date' ||
+      ty === 'datetime' || ty === 'enum') return t;
+  try { return JSON.parse(t); } catch { return t; }
+}
+
+async function act(action) {
+  if (!current) return;
+  const body = { action, reviewer: 'operator' };
+  if (action === 'correct') {
+    if (current.field_def?.type === 'table') {
+      body.corrected_value = tableEditorValue(current.field_def);
+    } else {
+      const v = parseCorrection($('#fix').value, current.field_def);
+      if (v === undefined) { toast('enter a corrected value first'); return; }
+      body.corrected_value = v;
+    }
+  }
+  const r = await fetch('/api/review/' + current.extraction_id, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!r.ok) { toast((await r.json()).detail, 4000); return; }
+  toast(action + ': ' + current.field_name);
+  await loadQueue(true);
+}
+
+document.addEventListener('keydown', e => {
+  if (activeView !== 'review') return;
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) act('correct');
+    return;
+  }
+  if (e.key === 'j') select(idx + 1);
+  else if (e.key === 'k') select(idx - 1);
+  else if (e.key === 'a') act('accept');
+  else if (e.key === 'r') act('reject');
+  else if (e.key === 'c') ($('#fix') || $('#tbl-edit input'))?.focus();
+  else if (e.key === 'g') toggleGuides();
+  else if (e.key === 'z') $('#imgwrap').classList.toggle('zoomed');
+});
+
+/* ---------------- boot ---------------- */
+loadSchemas();
+refreshDocs();
+loadQueueCount();
+pollRun(true);   // picks up a run already in progress on page load
+</script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+[project]
+name = "scribe"
+version = "0.1.0"
+description = "Local handwriting-to-structured-data pipeline. No document image or extracted value leaves the machine."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "typer>=0.15",
+    "rich>=13.9",
+    "pydantic>=2.10",
+    "pyyaml>=6.0",
+    "httpx>=0.28",
+    "pillow>=11.0",
+    "numpy>=2.1",
+    "opencv-python-headless>=4.10",
+    "pypdfium2>=4.30",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.34",
+    "python-multipart>=0.0.20",
+    "huggingface-hub>=0.27",
+]
+
+[project.optional-dependencies]
+# MLX serving stack. Apple Silicon only; kept optional so the validator and
+# JSON-repair tests run on any machine (and in CI) without a Metal device.
+mlx = [
+    "mlx-vlm>=0.6.15",
+    "llguidance>=0.7",
+    # mlx-vlm imports jinja2 at request time (chat templates) without
+    # declaring it; absent, every /chat/completions call 500s.
+    "jinja2>=3.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-cov>=6.0",
+]
+
+[project.scripts]
+scribe = "scribe.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/scribe"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.uv]
+package = true

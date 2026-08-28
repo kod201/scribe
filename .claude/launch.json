@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "scribe-review",
+      "runtimeExecutable": ".venv/bin/scribe",
+      "runtimeArgs": ["review"],
+      "port": 8666
+    }
+  ]
+}

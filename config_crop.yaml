@@ -1,0 +1,41 @@
+# Scribe runtime configuration (laptop defaults -- PRD 10).
+# Engines are named here and nowhere else in the codebase.
+
+layout_engine: qwen_grounding    # M1b crop-based benchmark config
+                                  # Apple Silicon findings behind this default.
+
+extraction_engine:
+  backend: mlx                    # mlx | vllm
+  model: mlx-community/Qwen3-VL-30B-A3B-Instruct-8bit
+  revision: 8794b4f0bce099a0ca7c40980ba7081527321e59   # pinned in M0
+  max_tokens: 512
+  temperature: 0
+  server_url: http://127.0.0.1:8081/v1   # 8080 is already taken on this box
+  request_timeout_s: 300
+  # Constrain decoding to the required output shape (PRD 7.2) using the
+  # server's json_schema response_format. Falls back to the repair prompt
+  # when the backend does not support it.
+  structured_output: true
+
+review_threshold_default: 0.85
+crop_margin_px: 24
+parallelism: 1
+
+ingest:
+  target_dpi: 200
+  deskew: true
+  denoise: true
+  max_edge_px: 2400              # long-edge cap handed to the VLM
+
+paths:
+  inbox: ./data/inbox
+  work: ./data/work
+  db: ./data/scribe_crop.sqlite
+  exports: ./data/exports
+
+security:
+  # Fail startup if the environment points at a cloud endpoint (PRD 13).
+  assert_offline: true
+  allow_hosts:
+    - 127.0.0.1
+    - localhost

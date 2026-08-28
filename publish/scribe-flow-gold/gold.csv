@@ -1,0 +1,222 @@
+pair_id,page_no,field_name,page_type,is_null,gold_json
+AMR_001,1,document_type,vitals_chart,false,"""vitals_chart"""
+AMR_001,1,patient_name,vitals_chart,false,"""E.J"""
+AMR_001,1,patient_age_years,vitals_chart,false,41
+AMR_001,1,patient_sex,vitals_chart,false,"""female"""
+AMR_001,1,hospital_number,vitals_chart,false,"""2023/BF/057"""
+AMR_001,1,document_date,vitals_chart,true,null
+AMR_001,1,ward,vitals_chart,false,"""Female medical ward"""
+AMR_001,1,vitals_diagnosis,vitals_chart,false,"""Acute Kidney Injury (AKI)"""
+AMR_001,1,vitals,vitals_chart,false,"[{""obs_date"": ""29/12/2023"", ""obs_time"": ""4:00pm"", ""temp_c"": 39.2, ""pulse_bpm"": 112, ""resp_rate_cpm"": 26, ""blood_pressure"": null}, {""obs_date"": ""29/12/2023"", ""obs_time"": ""8:00pm"", ""temp_c"": 38.7, ""pulse_bpm"": 109, ""resp_rate_cpm"": 24, ""blood_pressure"": null}, {""obs_date"": ""30/12/2023"", ""obs_time"": ""12:00am"", ""temp_c"": 38.2, ""pulse_bpm"": 108, ""resp_rate_cpm"": 23, ""blood_pressure"": null}, {""obs_date"": ""30/12/2023"", ""obs_time"": ""8:00am"", ""temp_c"": 37.9, ""pulse_bpm"": 100, ""resp_rate_cpm"": 20, ""blood_pressure"": null}, {""obs_date"": ""30/12/2023"", ""obs_time"": ""12:00pm"", ""temp_c"": 37.5, ""pulse_bpm"": 97, ""resp_rate_cpm"": 20, ""blood_pressure"": null}]"
+AMR_003,1,document_type,prescription,false,"""prescription"""
+AMR_003,1,patient_name,prescription,false,"""J.D"""
+AMR_003,1,patient_age_years,prescription,true,null
+AMR_003,1,patient_sex,prescription,false,"""female"""
+AMR_003,1,hospital_number,prescription,false,"""70079"""
+AMR_003,1,document_date,prescription,false,"""23/02/2025"""
+AMR_003,1,prescriber_name,prescription,false,"""Dr Joan Riz"""
+AMR_003,1,prescription_diagnosis,prescription,true,null
+AMR_003,1,medications,prescription,false,"[{""drug_name"": ""Cefuroxime"", ""dose"": ""500mg"", ""frequency"": ""bd"", ""duration"": ""x 5/7""}, {""drug_name"": ""Strepsils throat lozenges"", ""dose"": null, ""frequency"": ""Tqds"", ""duration"": ""x 5/7""}, {""drug_name"": ""Vitamin C (Calgorit)"", ""dose"": ""1000mg"", ""frequency"": null, ""duration"": ""x 20/7""}]"
+AMR_004,1,document_type,lab_request,false,"""lab_request"""
+AMR_004,1,patient_name,lab_request,false,"""E.R"""
+AMR_004,1,patient_age_years,lab_request,true,null
+AMR_004,1,patient_sex,lab_request,false,"""male"""
+AMR_004,1,hospital_number,lab_request,false,"""20067"""
+AMR_004,1,document_date,lab_request,false,"""17/07/2024"""
+AMR_004,1,requesting_doctor,lab_request,false,"""Dr Oloro Rafi"""
+AMR_004,1,specimen_type,lab_request,true,null
+AMR_004,1,lab_priority,lab_request,true,null
+AMR_004,1,lab_clinical_details,lab_request,true,null
+AMR_004,1,tests_requested,lab_request,false,[]
+AMR_005,1,document_type,vitals_chart,false,"""vitals_chart"""
+AMR_005,1,patient_name,vitals_chart,true,null
+AMR_005,1,patient_age_years,vitals_chart,true,null
+AMR_005,1,patient_sex,vitals_chart,true,null
+AMR_005,1,hospital_number,vitals_chart,false,"""7431742"""
+AMR_005,1,document_date,vitals_chart,true,null
+AMR_005,1,ward,vitals_chart,true,null
+AMR_005,1,vitals_diagnosis,vitals_chart,true,null
+AMR_005,1,vitals,vitals_chart,false,"[{""obs_date"": null, ""obs_time"": null, ""temp_c"": 38.2, ""pulse_bpm"": 68, ""resp_rate_cpm"": 38, ""blood_pressure"": ""119/79""}]"
+AMR_006,1,document_type,prescription,false,"""prescription"""
+AMR_006,1,patient_name,prescription,false,"""Usamatu Amaka"""
+AMR_006,1,patient_age_years,prescription,true,null
+AMR_006,1,patient_sex,prescription,false,"""female"""
+AMR_006,1,hospital_number,prescription,false,"""7401911"""
+AMR_006,1,document_date,prescription,false,"""10/10/2025"""
+AMR_006,1,prescriber_name,prescription,false,"""Dr. H Sani"""
+AMR_006,1,prescription_diagnosis,prescription,true,null
+AMR_006,1,medications,prescription,false,"[{""drug_name"": ""Tab omeprazole"", ""dose"": ""20mg"", ""frequency"": ""PO tds"", ""duration"": null}, {""drug_name"": ""Cap Amoxicillin"", ""dose"": ""500mg"", ""frequency"": ""bds"", ""duration"": ""14/7""}, {""drug_name"": ""Tab Clarithromycin"", ""dose"": ""250mg"", ""frequency"": ""bds"", ""duration"": null}]"
+AMR_007,1,document_type,prescription,false,"""prescription"""
+AMR_007,1,patient_name,prescription,false,"""Isabel Shehu"""
+AMR_007,1,patient_age_years,prescription,true,null
+AMR_007,1,patient_sex,prescription,false,"""female"""
+AMR_007,1,hospital_number,prescription,false,"""4040914"""
+AMR_007,1,document_date,prescription,false,"""24/07/2024"""
+AMR_007,1,prescriber_name,prescription,true,null
+AMR_007,1,prescription_diagnosis,prescription,true,null
+AMR_007,1,medications,prescription,false,"[{""drug_name"": ""Mannitol IV"", ""dose"": ""10%"", ""frequency"": null, ""duration"": null}]"
+AMR_008,1,document_type,vitals_chart,false,"""vitals_chart"""
+AMR_008,1,patient_name,vitals_chart,true,null
+AMR_008,1,patient_age_years,vitals_chart,true,null
+AMR_008,1,patient_sex,vitals_chart,true,null
+AMR_008,1,hospital_number,vitals_chart,false,"""2374101"""
+AMR_008,1,document_date,vitals_chart,true,null
+AMR_008,1,ward,vitals_chart,true,null
+AMR_008,1,vitals_diagnosis,vitals_chart,true,null
+AMR_008,1,vitals,vitals_chart,false,"[{""obs_date"": null, ""obs_time"": null, ""temp_c"": 37.1, ""pulse_bpm"": 78, ""resp_rate_cpm"": 18, ""blood_pressure"": ""123/81""}]"
+AMR_009,1,document_type,visit_note,false,"""visit_note"""
+AMR_009,1,patient_name,visit_note,true,null
+AMR_009,1,patient_age_years,visit_note,true,null
+AMR_009,1,patient_sex,visit_note,false,"""female"""
+AMR_009,1,hospital_number,visit_note,true,null
+AMR_009,1,document_date,visit_note,false,"""18/12/2024"""
+AMR_009,1,chief_complaint,visit_note,false,"""Head swelling from birth due to management of opening on the back. Child is not active and always in pain evidenced by constant cries even after feeding"""
+AMR_009,1,assessment,visit_note,true,null
+AMR_009,1,plan,visit_note,true,null
+AMR_010,1,document_type,lab_request,false,"""lab_request"""
+AMR_010,1,patient_name,lab_request,false,"""Emeka Sani"""
+AMR_010,1,patient_age_years,lab_request,true,null
+AMR_010,1,patient_sex,lab_request,false,"""male"""
+AMR_010,1,hospital_number,lab_request,false,"""5830682"""
+AMR_010,1,document_date,lab_request,false,"""12/05/2026"""
+AMR_010,1,requesting_doctor,lab_request,true,null
+AMR_010,1,specimen_type,lab_request,false,"""sputum"""
+AMR_010,1,lab_priority,lab_request,true,null
+AMR_010,1,lab_clinical_details,lab_request,false,"""?? TB"""
+AMR_010,1,tests_requested,lab_request,false,"[{""test_name"": ""GeneXpert""}]"
+AMR_011,1,document_type,lab_request,false,"""lab_request"""
+AMR_011,1,patient_name,lab_request,false,"""Waleed Adenuga"""
+AMR_011,1,patient_age_years,lab_request,true,null
+AMR_011,1,patient_sex,lab_request,false,"""male"""
+AMR_011,1,hospital_number,lab_request,false,"""5836082"""
+AMR_011,1,document_date,lab_request,false,"""12/03/2026"""
+AMR_011,1,requesting_doctor,lab_request,true,null
+AMR_011,1,specimen_type,lab_request,false,"""urine"""
+AMR_011,1,lab_priority,lab_request,true,null
+AMR_011,1,lab_clinical_details,lab_request,false,"""?? UTI"""
+AMR_011,1,tests_requested,lab_request,false,"[{""test_name"": ""M/C/S""}]"
+AMR_012,1,document_type,lab_request,false,"""lab_request"""
+AMR_012,1,patient_name,lab_request,false,"""Miss J.I"""
+AMR_012,1,patient_age_years,lab_request,false,12
+AMR_012,1,patient_sex,lab_request,false,"""female"""
+AMR_012,1,hospital_number,lab_request,false,"""2026/PD/1266"""
+AMR_012,1,document_date,lab_request,false,"""10/03/2026"""
+AMR_012,1,requesting_doctor,lab_request,false,"""Dr Naya Iyare"""
+AMR_012,1,specimen_type,lab_request,true,null
+AMR_012,1,lab_priority,lab_request,false,"""urgent"""
+AMR_012,1,lab_clinical_details,lab_request,false,"""Oliguria 2/52, vomiting 2/52, generalized edema 1/52, fever 1/52, abdominal pain 2/7. Suspected AKI with nephrotic overlap -?"""
+AMR_012,1,tests_requested,lab_request,false,"[{""test_name"": ""Complete Blood Count""}, {""test_name"": ""Renal Function Test (urea, creatinine, eGFR)""}, {""test_name"": ""Electrolytes""}, {""test_name"": ""Urinalysis""}, {""test_name"": ""Serum Albumin""}, {""test_name"": ""Urine Protein / Creatinine Ratio""}]"
+AMR_014,1,document_type,prescription,false,"""prescription"""
+AMR_014,1,patient_name,prescription,false,"""Miss J.I"""
+AMR_014,1,patient_age_years,prescription,false,12
+AMR_014,1,patient_sex,prescription,false,"""female"""
+AMR_014,1,hospital_number,prescription,false,"""2026/PD/1266"""
+AMR_014,1,document_date,prescription,false,"""10/03/2026"""
+AMR_014,1,prescriber_name,prescription,false,"""Dr Naya Iyare"""
+AMR_014,1,prescription_diagnosis,prescription,false,"""Oliguria 2/52, vomiting 2/52, generalized edema 1/52, fever 1/52, abdominal pain 2/7. Suspected AKI with nephrotic syndrome overlap?"""
+AMR_014,1,medications,prescription,false,"[{""drug_name"": ""Furosemide"", ""dose"": ""2 mg/kg/dose IV"", ""frequency"": null, ""duration"": null}, {""drug_name"": ""Oral nifedipine"", ""dose"": ""0.3 mg/kg/day"", ""frequency"": ""in divided doses"", ""duration"": ""2 days""}, {""drug_name"": ""Tab Paracetamol"", ""dose"": ""10 mg/kg/dose"", ""frequency"": ""6 hourly"", ""duration"": ""3 days""}]"
+AMR_015,1,document_type,vitals_chart,false,"""vitals_chart"""
+AMR_015,1,patient_name,vitals_chart,false,"""Miss J.I"""
+AMR_015,1,patient_age_years,vitals_chart,false,12
+AMR_015,1,patient_sex,vitals_chart,false,"""female"""
+AMR_015,1,hospital_number,vitals_chart,true,null
+AMR_015,1,document_date,vitals_chart,true,null
+AMR_015,1,ward,vitals_chart,false,"""Paediatric ward"""
+AMR_015,1,vitals_diagnosis,vitals_chart,false,"""Acute kidney injury"""
+AMR_015,1,vitals,vitals_chart,false,"[{""obs_date"": ""10/03/2026"", ""obs_time"": ""12:00"", ""temp_c"": 38.2, ""pulse_bpm"": 85, ""resp_rate_cpm"": 20, ""blood_pressure"": ""150/100""}, {""obs_date"": ""10/03/2026"", ""obs_time"": ""16:00"", ""temp_c"": 38.4, ""pulse_bpm"": 88, ""resp_rate_cpm"": 20, ""blood_pressure"": ""148/96""}, {""obs_date"": ""10/03/2026"", ""obs_time"": ""20:00"", ""temp_c"": 38.1, ""pulse_bpm"": 90, ""resp_rate_cpm"": 21, ""blood_pressure"": ""134/95""}, {""obs_date"": ""11/03/2026"", ""obs_time"": ""08:00"", ""temp_c"": 38.1, ""pulse_bpm"": 88, ""resp_rate_cpm"": 19, ""blood_pressure"": ""140/94""}, {""obs_date"": ""11/03/2026"", ""obs_time"": ""12:00"", ""temp_c"": 37.9, ""pulse_bpm"": 90, ""resp_rate_cpm"": 20, ""blood_pressure"": ""136/90""}, {""obs_date"": ""11/03/2026"", ""obs_time"": ""16:00"", ""temp_c"": 37.9, ""pulse_bpm"": 86, ""resp_rate_cpm"": 20, ""blood_pressure"": ""130/90""}, {""obs_date"": ""11/03/2026"", ""obs_time"": ""20:00"", ""temp_c"": 37.6, ""pulse_bpm"": 84, ""resp_rate_cpm"": 18, ""blood_pressure"": ""132/86""}, {""obs_date"": ""12/03/2026"", ""obs_time"": ""08:00"", ""temp_c"": 37.7, ""pulse_bpm"": 86, ""resp_rate_cpm"": 20, ""blood_pressure"": ""130/88""}, {""obs_date"": ""12/03/2026"", ""obs_time"": ""12:00"", ""temp_c"": 37.4, ""pulse_bpm"": 82, ""resp_rate_cpm"": 18, ""blood_pressure"": ""126/84""}, {""obs_date"": ""12/03/2026"", ""obs_time"": ""16:00"", ""temp_c"": 37.1, ""pulse_bpm"": 84, ""resp_rate_cpm"": 16, ""blood_pressure"": ""128/80""}, {""obs_date"": ""12/03/2026"", ""obs_time"": ""20:00"", ""temp_c"": 36.9, ""pulse_bpm"": 80, ""resp_rate_cpm"": 18, ""blood_pressure"": ""120/78""}]"
+AMR_016,1,document_type,lab_request,false,"""lab_request"""
+AMR_016,1,patient_name,lab_request,false,"""F. O"""
+AMR_016,1,patient_age_years,lab_request,false,19
+AMR_016,1,patient_sex,lab_request,false,"""male"""
+AMR_016,1,hospital_number,lab_request,false,"""2026/SC/015"""
+AMR_016,1,document_date,lab_request,false,"""12/03/2026"""
+AMR_016,1,requesting_doctor,lab_request,true,null
+AMR_016,1,specimen_type,lab_request,true,null
+AMR_016,1,lab_priority,lab_request,true,null
+AMR_016,1,lab_clinical_details,lab_request,false,"""Known HbSS patient presenting with: Generalized body pain, Fever, Weakness. ? Vaso-occlusive crisis ? Underlying infection"""
+AMR_016,1,tests_requested,lab_request,false,"[{""test_name"": ""Full Blood Count""}, {""test_name"": ""Reticulocyte count""}, {""test_name"": ""Peripheral blood film""}, {""test_name"": ""Malaria parasite test""}, {""test_name"": ""Serum electrolytes, Urea and Creatinine""}]"
+AMR_017,1,document_type,vitals_chart,false,"""vitals_chart"""
+AMR_017,1,patient_name,vitals_chart,false,"""F.O"""
+AMR_017,1,patient_age_years,vitals_chart,false,19
+AMR_017,1,patient_sex,vitals_chart,false,"""male"""
+AMR_017,1,hospital_number,vitals_chart,false,"""2026/SC/015"""
+AMR_017,1,document_date,vitals_chart,true,null
+AMR_017,1,ward,vitals_chart,false,"""Male medical ward"""
+AMR_017,1,vitals_diagnosis,vitals_chart,false,"""Vaso-occlusive crisis [SCD]"""
+AMR_017,1,vitals,vitals_chart,false,"[{""obs_date"": ""12/03/2026"", ""obs_time"": ""08:00"", ""temp_c"": 38.5, ""pulse_bpm"": 102, ""resp_rate_cpm"": 24, ""blood_pressure"": null}, {""obs_date"": ""12/03/2026"", ""obs_time"": ""12:00"", ""temp_c"": 38.2, ""pulse_bpm"": 100, ""resp_rate_cpm"": 23, ""blood_pressure"": null}, {""obs_date"": ""12/03/2026"", ""obs_time"": ""16:00"", ""temp_c"": 37.8, ""pulse_bpm"": 96, ""resp_rate_cpm"": 22, ""blood_pressure"": null}, {""obs_date"": ""12/03/2026"", ""obs_time"": ""20:00"", ""temp_c"": 37.5, ""pulse_bpm"": 90, ""resp_rate_cpm"": 20, ""blood_pressure"": null}, {""obs_date"": ""13/03/2026"", ""obs_time"": ""08:00"", ""temp_c"": 37.2, ""pulse_bpm"": 84, ""resp_rate_cpm"": 18, ""blood_pressure"": null}]"
+AMR_019,1,document_type,prescription,false,"""prescription"""
+AMR_019,1,patient_name,prescription,false,"""F. O"""
+AMR_019,1,patient_age_years,prescription,false,19
+AMR_019,1,patient_sex,prescription,false,"""male"""
+AMR_019,1,hospital_number,prescription,false,"""2026/SC/015"""
+AMR_019,1,document_date,prescription,false,"""12/03/2026"""
+AMR_019,1,prescriber_name,prescription,true,null
+AMR_019,1,prescription_diagnosis,prescription,false,"""Vaso-occlusive crisis secondary to Sickle cell disease"""
+AMR_019,1,medications,prescription,false,"[{""drug_name"": ""Tab Paracetamol"", ""dose"": ""500mg"", ""frequency"": ""1 tablet every 8 hours"", ""duration"": ""x 3/7""}, {""drug_name"": ""Tab Ibuprofen"", ""dose"": ""400mg"", ""frequency"": ""1 tablet every 12 hours"", ""duration"": ""× 3/7""}, {""drug_name"": ""Tab Folic acid"", ""dose"": ""5mg"", ""frequency"": ""1 tablet daily"", ""duration"": ""30 days""}, {""drug_name"": ""IV Normal Saline 0.9%"", ""dose"": ""1 litre"", ""frequency"": ""over 8 hours"", ""duration"": null}, {""drug_name"": ""IM Diclofenac"", ""dose"": ""75mg"", ""frequency"": null, ""duration"": null}]"
+AMR_020,1,document_type,visit_note,false,"""visit_note"""
+AMR_020,1,patient_name,visit_note,false,"""Chinedu Okafor"""
+AMR_020,1,patient_age_years,visit_note,false,28
+AMR_020,1,patient_sex,visit_note,false,"""male"""
+AMR_020,1,hospital_number,visit_note,false,"""MED/001/26"""
+AMR_020,1,document_date,visit_note,false,"""23/03/2026"""
+AMR_020,1,chief_complaint,visit_note,false,"""Burning chest pain for 3 days"""
+AMR_020,1,assessment,visit_note,false,"""Likely GERD"""
+AMR_020,1,plan,visit_note,false,"""Omeprazole 20 mg daily. Lifestyle modification. Review in 1 week"""
+AMR_021,1,document_type,vitals_chart,false,"""vitals_chart"""
+AMR_021,1,patient_name,vitals_chart,false,"""Amina Bello"""
+AMR_021,1,patient_age_years,vitals_chart,true,null
+AMR_021,1,patient_sex,vitals_chart,true,null
+AMR_021,1,hospital_number,vitals_chart,false,"""MED/002/26"""
+AMR_021,1,document_date,vitals_chart,false,"""23/03/2026"""
+AMR_021,1,ward,vitals_chart,true,null
+AMR_021,1,vitals_diagnosis,vitals_chart,true,null
+AMR_021,1,vitals,vitals_chart,false,"[{""obs_date"": null, ""obs_time"": ""8:00 AM"", ""temp_c"": 37.2, ""pulse_bpm"": 78, ""resp_rate_cpm"": 18, ""blood_pressure"": ""110/70""}, {""obs_date"": null, ""obs_time"": ""12:00 PM"", ""temp_c"": 37.5, ""pulse_bpm"": 82, ""resp_rate_cpm"": 20, ""blood_pressure"": ""115/75""}, {""obs_date"": null, ""obs_time"": ""4:00 PM"", ""temp_c"": 37.3, ""pulse_bpm"": 80, ""resp_rate_cpm"": 18, ""blood_pressure"": ""112/72""}, {""obs_date"": null, ""obs_time"": ""8:00 PM"", ""temp_c"": 37.0, ""pulse_bpm"": 76, ""resp_rate_cpm"": 17, ""blood_pressure"": ""110/70""}]"
+AMR_022,1,document_type,prescription,false,"""prescription"""
+AMR_022,1,patient_name,prescription,false,"""Blessing Ehiakhamen"""
+AMR_022,1,patient_age_years,prescription,false,22
+AMR_022,1,patient_sex,prescription,false,"""female"""
+AMR_022,1,hospital_number,prescription,false,"""MED/003/26"""
+AMR_022,1,document_date,prescription,false,"""23/03/2026"""
+AMR_022,1,prescriber_name,prescription,false,"""Dr. A. Johnson"""
+AMR_022,1,prescription_diagnosis,prescription,false,"""Malaria"""
+AMR_022,1,medications,prescription,false,"[{""drug_name"": ""Artemether/Lumefantrine"", ""dose"": ""4 tabs"", ""frequency"": ""stat, 4 tabs after 8 hrs, then 4 tabs BD"", ""duration"": ""2 days""}, {""drug_name"": ""Paracetamol"", ""dose"": ""500 mg"", ""frequency"": ""1 tab every 8 hrs"", ""duration"": ""3 days""}, {""drug_name"": ""ORS"", ""dose"": null, ""frequency"": ""as needed"", ""duration"": null}]"
+AMR_023,1,document_type,lab_request,false,"""lab_request"""
+AMR_023,1,patient_name,lab_request,false,"""Samuel Ogunleye"""
+AMR_023,1,patient_age_years,lab_request,false,35
+AMR_023,1,patient_sex,lab_request,false,"""male"""
+AMR_023,1,hospital_number,lab_request,false,"""MED/004/26"""
+AMR_023,1,document_date,lab_request,false,"""23/03/2026"""
+AMR_023,1,requesting_doctor,lab_request,false,"""Dr. A. Johnson"""
+AMR_023,1,specimen_type,lab_request,false,"""blood"""
+AMR_023,1,lab_priority,lab_request,false,"""routine"""
+AMR_023,1,lab_clinical_details,lab_request,false,"""Fever for 5 days, weakness, headache"""
+AMR_023,1,tests_requested,lab_request,false,"[{""test_name"": ""FBC""}, {""test_name"": ""Malaria Parasite Test""}, {""test_name"": ""Widal Test""}, {""test_name"": ""Blood Culture""}]"
+SYN_001,1,document_type,prescription,false,"""prescription"""
+SYN_001,1,patient_name,prescription,false,"""Ngozi Abara"""
+SYN_001,1,patient_age_years,prescription,false,34
+SYN_001,1,patient_sex,prescription,false,"""female"""
+SYN_001,1,hospital_number,prescription,false,"""SYN/001/26"""
+SYN_001,1,document_date,prescription,false,"""14/04/2026"""
+SYN_001,1,prescriber_name,prescription,false,"""Dr. Ifeoma Nwosu"""
+SYN_001,1,prescription_diagnosis,prescription,false,"""Community acquired pneumonia"""
+SYN_001,1,medications,prescription,false,"[{""drug_name"": ""Tab Amoxicillin"", ""dose"": ""500mg"", ""frequency"": ""tds"", ""duration"": ""x 7/7""}, {""drug_name"": ""Tab Paracetamol"", ""dose"": ""500mg"", ""frequency"": ""qds"", ""duration"": ""x 5/7""}, {""drug_name"": ""Syr Ascorbic acid"", ""dose"": ""100mg"", ""frequency"": ""daily"", ""duration"": ""x 10/7""}]"
+SYN_002,1,document_type,vitals_chart,false,"""vitals_chart"""
+SYN_002,1,patient_name,vitals_chart,false,"""Tunde Balogun"""
+SYN_002,1,patient_age_years,vitals_chart,false,57
+SYN_002,1,patient_sex,vitals_chart,false,"""male"""
+SYN_002,1,hospital_number,vitals_chart,false,"""SYN/002/26"""
+SYN_002,1,document_date,vitals_chart,true,null
+SYN_002,1,ward,vitals_chart,false,"""Male medical ward"""
+SYN_002,1,vitals_diagnosis,vitals_chart,false,"""Congestive cardiac failure"""
+SYN_002,1,vitals,vitals_chart,false,"[{""obs_date"": ""14/04/2026"", ""obs_time"": ""08:00"", ""temp_c"": 38.6, ""pulse_bpm"": 104, ""resp_rate_cpm"": 24, ""blood_pressure"": null}, {""obs_date"": ""14/04/2026"", ""obs_time"": ""12:00"", ""temp_c"": null, ""pulse_bpm"": 98, ""resp_rate_cpm"": 22, ""blood_pressure"": null}, {""obs_date"": ""14/04/2026"", ""obs_time"": ""16:00"", ""temp_c"": 37.8, ""pulse_bpm"": null, ""resp_rate_cpm"": 20, ""blood_pressure"": null}, {""obs_date"": ""14/04/2026"", ""obs_time"": ""20:00"", ""temp_c"": 37.4, ""pulse_bpm"": 88, ""resp_rate_cpm"": 19, ""blood_pressure"": null}, {""obs_date"": ""15/04/2026"", ""obs_time"": ""08:00"", ""temp_c"": 37.1, ""pulse_bpm"": 84, ""resp_rate_cpm"": 18, ""blood_pressure"": null}]"
+SYN_003,1,document_type,lab_request,false,"""lab_request"""
+SYN_003,1,patient_name,lab_request,false,"""Chidi Eze"""
+SYN_003,1,patient_age_years,lab_request,true,null
+SYN_003,1,patient_sex,lab_request,false,"""male"""
+SYN_003,1,hospital_number,lab_request,false,"""SYN/003/26"""
+SYN_003,1,document_date,lab_request,false,"""15/04/2026"""
+SYN_003,1,requesting_doctor,lab_request,false,"""Dr. K. Musa"""
+SYN_003,1,specimen_type,lab_request,true,null
+SYN_003,1,lab_priority,lab_request,true,null
+SYN_003,1,lab_clinical_details,lab_request,false,"""Fever 4/7, headache, joint pains. ?? Malaria"""
+SYN_003,1,tests_requested,lab_request,false,"[{""test_name"": ""Full Blood Count""}, {""test_name"": ""Malaria parasite test""}, {""test_name"": ""Serum electrolytes, urea & creatinine""}]"

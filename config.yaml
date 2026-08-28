@@ -1,0 +1,64 @@
+# Scribe runtime configuration (laptop defaults -- PRD 10).
+# Engines are named here and nowhere else in the codebase.
+
+layout_engine: qwen_grounding     # localize via the same VLM server; see
+                                  # docs/bench.md M1b/M4 for why. Set to `none`
+                                  # for the whole-page v0 baseline.
+
+# Crop-extract only these field types; the rest keep full-page context.
+# Routed mode beat both pure modes on every quality metric (bench.md M4).
+crop_field_types: [table, date, enum, checkbox_group]
+
+extraction_engine:
+  backend: mlx                    # mlx | vllm
+  # Qwen3.8-27B promoted at M4 (docs/bench.md v5): exact 76->81%, halluc
+  # 12->8%, flag rate into budget, at ~1.7x the latency. Previous primary:
+  # mlx-community/Qwen3-VL-30B-A3B-Instruct-8bit @ 8794b4f0bce0 (faster).
+  model: mlx-community/Qwen3.8-27B-8bit
+  revision: 815b83c0df8ffd1d1b5244cf75fd6ef14fca9ef9
+  max_tokens: 512
+  temperature: 0
+  server_url: http://127.0.0.1:8081/v1   # 8080 is already taken on this box
+  request_timeout_s: 300
+  # Constrain decoding to the required output shape (PRD 7.2) using the
+  # server's json_schema response_format. Falls back to the repair prompt
+  # when the backend does not support it.
+  structured_output: true
+
+# Second read of every auto-accepted field by a different model;
+# disagreement routes the field to review. Auto-accept accuracy 79% -> 95%
+# on the flow bench (docs/bench.md M4). Start this server with
+# `scribe serve --verify` in its own terminal.
+verify_pass: true
+verify_engine:
+  backend: mlx
+  model: mlx-community/Qwen3-VL-8B-Instruct-8bit
+  revision: a0093b9b5fda6f76ddd4a462c6830ae7c4fe47ec
+  max_tokens: 512
+  temperature: 0
+  server_url: http://127.0.0.1:8082/v1
+  request_timeout_s: 300
+  structured_output: true
+
+review_threshold_default: 0.85
+crop_margin_px: 24
+parallelism: 1
+
+ingest:
+  target_dpi: 200
+  deskew: true
+  denoise: true
+  max_edge_px: 2400              # long-edge cap handed to the VLM
+
+paths:
+  inbox: ./data/inbox
+  work: ./data/work
+  db: ./data/scribe.sqlite
+  exports: ./data/exports
+
+security:
+  # Fail startup if the environment points at a cloud endpoint (PRD 13).
+  assert_offline: true
+  allow_hosts:
+    - 127.0.0.1
+    - localhost

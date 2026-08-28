@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 470" font-family="Helvetica, Arial, sans-serif">
+  <rect width="780" height="470" fill="#ffffff"/>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+  </defs>
+
+  <!-- row 1: ingest, locate, read, validate -->
+  <g font-size="22" font-weight="bold" text-anchor="middle" fill="#0f172a">
+    <rect x="20"  y="30" width="160" height="84" rx="12" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+    <text x="100" y="68">ingest</text>
+    <rect x="220" y="30" width="160" height="84" rx="12" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+    <text x="300" y="68">locate</text>
+    <rect x="420" y="30" width="160" height="84" rx="12" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+    <text x="500" y="68">read</text>
+    <rect x="620" y="30" width="140" height="84" rx="12" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+    <text x="690" y="68">validate</text>
+  </g>
+  <g font-size="15" text-anchor="middle" fill="#475569">
+    <text x="100" y="94">scan / photo</text>
+    <text x="300" y="94">grounding boxes</text>
+    <text x="500" y="94">crops + whole page</text>
+    <text x="690" y="94">schema + types</text>
+  </g>
+
+  <!-- row 1 arrows -->
+  <g stroke="#475569" stroke-width="2.5" fill="none" marker-end="url(#arr)">
+    <line x1="180" y1="72" x2="214" y2="72"/>
+    <line x1="380" y1="72" x2="414" y2="72"/>
+    <line x1="580" y1="72" x2="614" y2="72"/>
+    <path d="M 690 114 L 690 170 L 240 170 L 240 220"/>
+  </g>
+
+  <!-- row 2: verify -->
+  <g font-size="22" font-weight="bold" text-anchor="middle" fill="#0f172a">
+    <rect x="140" y="226" width="200" height="90" rx="12" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+    <text x="240" y="264">verify</text>
+  </g>
+  <g font-size="15" text-anchor="middle" fill="#475569">
+    <text x="240" y="290">second read by a</text>
+    <text x="240" y="308">different model</text>
+  </g>
+
+  <!-- outcomes -->
+  <g font-size="20" font-weight="bold" text-anchor="middle" fill="#0f172a">
+    <rect x="480" y="200" width="270" height="80" rx="12" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+    <text x="615" y="234">review queue</text>
+    <rect x="480" y="320" width="270" height="80" rx="12" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+    <text x="615" y="354">structured record</text>
+  </g>
+  <g font-size="15" text-anchor="middle" fill="#475569">
+    <text x="615" y="258">anything uncertain → a human</text>
+    <text x="615" y="378">provenance attached</text>
+  </g>
+
+  <!-- outcome arrows -->
+  <g stroke="#475569" stroke-width="2.5" fill="none" marker-end="url(#arr)">
+    <line x1="340" y1="252" x2="474" y2="242"/>
+    <line x1="340" y1="290" x2="474" y2="352"/>
+  </g>
+  <g font-size="16" font-weight="bold" fill="#334155">
+    <text x="360" y="234">disagree / fail</text>
+    <text x="366" y="336">agree</text>
+  </g>
+
+  <text x="20" y="446" font-size="15.5" fill="#64748b">One machine, fully offline — a socket guard blocks every connection off loopback.</text>
+</svg>

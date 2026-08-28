@@ -1,0 +1,303 @@
+# Flow-set schema for the AMR corpus (PRD 10.1, 12.1).
+#
+# PURPOSE: prove the pipeline end to end. Accuracy measured against this schema
+# is a plumbing check, never a performance claim -- AMR is public and may
+# overlap model training data. Sign-off metrics come from samples/heldout/.
+#
+# Field set is derived from the 20 pulled pairs, which span four document
+# types. Several fields are deliberately unforgiving so the review path gets
+# exercised on real content:
+#   - patient_age_years is an integer, but many records write "Ad" (adult).
+#     The correct behaviour is null + note, not a guessed number.
+#   - document_date appears as 23/02/25, 10 Oct 2025, 24-07-2024 and
+#     12 March, 2026. The model must normalise while raw_transcription keeps
+#     what was actually written.
+#   - Vitals-snapshot pages (AMR_005, AMR_008) carry no name and no date, so
+#     required fields legitimately come back null and must be flagged.
+
+schema_id: amr_flow_v1
+version: 1
+description: >
+  Nigerian handwritten clinical records: visit notes, vitals charts,
+  prescriptions and laboratory request forms.
+
+page_types:
+  - id: visit_note
+    detect_hint: "Prose clinical narrative: presenting complaint, history, examination, assessment, plan."
+  - id: vitals_chart
+    detect_hint: "Header mentions observation or vital signs, or the page is a grid of time/temperature/pulse readings."
+  - id: prescription
+    detect_hint: "Header mentions prescription, or the body is an Rx list of drugs with doses."
+  - id: lab_request
+    detect_hint: "Header mentions laboratory or lab request, and the body lists investigations or specimen type."
+
+fields:
+
+  # ---- global: present on every page type ------------------------------
+
+  - name: document_type
+    type: enum
+    values: [visit_note, vitals_chart, prescription, lab_request]
+    required: true
+    allow_null: false
+    review_threshold: 0.90
+    extract_hint: >
+      Classify the whole page. A page listing drugs with doses is a
+      prescription even when it has no printed header. A page listing
+      investigations or a specimen is a lab_request. A page that is mostly a
+      grid of repeated time/temperature/pulse readings, or a short block of
+      PR/RR/BP/Temp values, is a vitals_chart. Continuous clinical prose is a
+      visit_note.
+
+  - name: patient_name
+    type: string
+    max_length: 120
+    required: false
+    extract_hint: >
+      As written, including initials-only forms such as "F.O" or "Miss J.I".
+      Keep the title if one is written. Some pages identify the patient only
+      by hospital number and bed -- return null then, do not invent a name.
+      Nigerian surnames in this data are frequently NOT common words: read the
+      strokes letter by letter and resist completing toward a name you know.
+      If two letters are genuinely ambiguous, choose the stroke reading and
+      set confidence at or below 0.7.
+
+  - name: patient_age_years
+    type: integer
+    min: 0
+    max: 120
+    required: false
+    review_threshold: 0.90
+    extract_hint: >
+      Age in whole years. "12 years" is 12. If the age is written as a
+      non-numeric abbreviation such as "Ad", "AD" or "Adult", return null and
+      say so in note -- do NOT guess a number. If the age is in months
+      (for example "5 month old"), return null and record the written age in
+      note. Never infer age from context elsewhere on the page.
+
+  - name: patient_sex
+    type: enum
+    values: [male, female, unknown]
+    required: false
+    extract_hint: >
+      Normalise M/Male to male and F/Female to female. "Age/Sex: 41/F" means
+      female. If sex is written nowhere on the page, return null -- do not
+      infer it from the patient's name.
+
+  - name: hospital_number
+    type: string
+    max_length: 40
+    required: false
+    extract_hint: >
+      The patient identifier, however it is labelled: "Hospital No",
+      "Hospital number", "HRN", "HRN NO.", "Patient ID". Transcribe exactly,
+      preserving slashes and case, e.g. "2026/SC/015" or "7431742". This is
+      not the bed number and not the ward.
+
+  - name: document_date
+    type: date
+    format: "%d/%m/%Y"
+    required: false
+    review_threshold: 0.90
+    extract_hint: >
+      The date the document was written. Normalise to DD/MM/YYYY. Day-first:
+      "23/02/25" is 23 February 2025. A two-digit year means 20xx. Written
+      forms such as "10 Oct, 2025", "12 March, 2026" and "24-07-2024" must be
+      converted. Put the characters actually written in raw_transcription. If
+      several dates appear, use the one identifying the document itself, not a
+      date inside an observation table.
+
+  # ---- vitals_chart ----------------------------------------------------
+
+  - name: ward
+    type: string
+    max_length: 80
+    page_type: vitals_chart
+    extract_hint: "Ward or unit name, e.g. 'Female medical ward', 'Paediatric ward'."
+
+  - name: vitals_diagnosis
+    type: string
+    max_length: 200
+    page_type: vitals_chart
+    extract_hint: >
+      The diagnosis recorded in the chart header, transcribed as written
+      including any abbreviation in brackets. Null if the page has no
+      diagnosis line.
+
+  - name: vitals
+    type: table
+    page_type: vitals_chart
+    max_rows: 30
+    extract_hint: >
+      One row per recorded observation, top to bottom. Some pages are a single
+      snapshot with no table and no times -- emit one row with time null.
+      Copy numbers exactly; do not average, interpolate or fill gaps. Omit a
+      column value that is not recorded rather than guessing it.
+    columns:
+      - name: obs_date
+        type: date
+        format: "%d/%m/%Y"
+        extract_hint: "Date of this reading, or null if the row has none."
+      - name: obs_time
+        type: string
+        max_length: 12
+        extract_hint: "As written, e.g. '4:00pm', '08:00', '12:00 PM'."
+      - name: temp_c
+        type: float
+        min: 25.0
+        max: 45.0
+        extract_hint: "Degrees Celsius, number only. '38.2°c' is 38.2."
+      - name: pulse_bpm
+        type: integer
+        min: 20
+        max: 250
+        extract_hint: "Beats per minute. 'PR - 68/m' is 68."
+      - name: resp_rate_cpm
+        type: integer
+        min: 5
+        max: 90
+        extract_hint: "Respiratory rate in cycles per minute."
+      - name: blood_pressure
+        type: string
+        regex: '^\d{2,3}/\d{2,3}$'
+        extract_hint: "Systolic/diastolic as written, e.g. '119/79'. Drop the unit."
+
+  # ---- prescription ----------------------------------------------------
+
+  - name: prescriber_name
+    type: string
+    max_length: 80
+    page_type: prescription
+    extract_hint: >
+      The prescribing clinician, from a line labelled Doctor's name, Physician
+      Name or Prescriber. Keep the title, e.g. "Dr Joan Riz". Null if only a
+      signature is present.
+
+  - name: prescription_diagnosis
+    type: string
+    max_length: 200
+    page_type: prescription
+    extract_hint: "Diagnosis or clinical note, as written. Null if absent."
+
+  - name: medications
+    type: table
+    page_type: prescription
+    max_rows: 20
+    extract_hint: >
+      One row per prescribed item, in the order written. Drug names are the
+      highest-risk field on the page: transcribe exactly what is written and
+      never correct a spelling toward a drug you expect. If a drug name is not
+      clearly legible, leave drug_name null rather than guessing.
+      Column splitting rules, apply them mechanically: drug_name = form word
+      (Tab/Cap/Syr/IV/IM) plus the name, e.g. "Tab Paracetamol"; dose = the
+      strength/quantity with unit, e.g. "500mg", "2 mg/kg/dose", "1 litre";
+      frequency = the schedule words exactly as written ("bd", "tds",
+      "1 tablet every 8 hours", "stat", "over 8 hours"); duration = the length
+      of treatment ("x 5/7", "14/7", "3 days", "30 days"). Anything that names
+      how long treatment lasts goes in duration, never in frequency.
+    columns:
+      - name: drug_name
+        type: string
+        max_length: 120
+        extract_hint: >
+          Drug name with its form if written, e.g. "Tab Paracetamol",
+          "Cap Amoxicillin", "IV Normal Saline 0.9%".
+      - name: dose
+        type: string
+        max_length: 60
+        extract_hint: "Strength or dose, e.g. '500mg', '2 mg/kg/dose'."
+      - name: frequency
+        type: string
+        max_length: 60
+        extract_hint: >
+          As written, keeping clinical abbreviations: 'bd', 'tds', 'qds',
+          'every 8 hours', 'stat', 'daily'.
+      - name: duration
+        type: string
+        max_length: 40
+        extract_hint: >
+          As written. Nigerian charts use 'x 5/7' for five days and '14/7' for
+          fourteen days -- keep that notation, do not convert it.
+
+  # ---- lab_request -----------------------------------------------------
+
+  - name: requesting_doctor
+    type: string
+    max_length: 80
+    page_type: lab_request
+    extract_hint: "From 'Requested by', 'Requesting Doctor' or 'Physician Name'."
+
+  - name: specimen_type
+    type: enum
+    values: [blood, urine, stool, csf, sputum, other]
+    page_type: lab_request
+    extract_hint: >
+      The specimen named or ticked. 'Sputum' is sputum, 'M/C/S' on urine is
+      urine. On tick-box forms: a checkbox counts as ticked ONLY if there is a
+      clear pen mark INSIDE the box; a printed empty square is not a tick.
+      Look at each box in turn; if every box is empty, the answer is null --
+      do not pick the first box and do not infer the specimen from the tests
+      requested.
+
+  - name: lab_priority
+    type: enum
+    values: [routine, urgent]
+    page_type: lab_request
+    extract_hint: >
+      Only if stated. 'Results to be reported urgently' is urgent, 'Routine'
+      is routine. Null when the form says nothing about priority.
+
+  - name: lab_clinical_details
+    type: free_text
+    max_length: 600
+    page_type: lab_request
+    extract_hint: >
+      The clinical details or provisional diagnosis, transcribed as written
+      including question marks that denote uncertainty, e.g. '?? TB'.
+
+  - name: tests_requested
+    type: table
+    page_type: lab_request
+    max_rows: 20
+    extract_hint: >
+      One row per investigation requested. On tick-box forms include only
+      tests that are actually ticked. On free-text forms list them in written
+      order. If no test is legibly marked, return an empty list.
+    columns:
+      - name: test_name
+        type: string
+        max_length: 120
+        extract_hint: "The investigation as written, e.g. 'GeneXpert', 'Full Blood Count'."
+
+  # ---- visit_note ------------------------------------------------------
+
+  - name: chief_complaint
+    type: free_text
+    max_length: 400
+    page_type: visit_note
+    extract_hint: >
+      The presenting complaint, from a section labelled 'Chief Complaint',
+      'PC' or 'Presenting complaint'.
+
+  - name: assessment
+    type: free_text
+    max_length: 400
+    page_type: visit_note
+    extract_hint: "The assessment, impression or working diagnosis. Null if absent."
+
+  - name: plan
+    type: free_text
+    max_length: 400
+    page_type: visit_note
+    extract_hint: "The management plan, as written. Null if absent."
+
+cross_field_rules:
+  - rule: "document_type != 'prescription' or len(medications or []) > 0"
+    on_fail: flag_both
+    message: "A prescription page with no medications extracted is almost certainly a miss."
+  - rule: "document_type != 'vitals_chart' or len(vitals or []) > 0"
+    on_fail: flag_both
+    message: "A vitals chart with no rows extracted is almost certainly a miss."
+  - rule: "patient_age_years is None or 0 <= patient_age_years <= 120"
+    on_fail: flag_both
+    message: "Age outside plausible range."

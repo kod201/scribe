@@ -1,0 +1,60 @@
+# Scribe on the CUDA box (M5 target: Lusaka GPU server).
+# Copy to config.yaml on that machine and adjust. Same interfaces, same
+# pipeline; only the serving backend and model repo change.
+
+layout_engine: qwen_grounding
+crop_field_types: [table, date, enum, checkbox_group]
+verify_pass: false                # enable after measuring throughput
+
+extraction_engine:
+  backend: vllm
+  # CUDA uses the original repo, not the MLX conversion. Pin the revision
+  # once chosen and record it in docs/bench.md.
+  model: Qwen/Qwen3-VL-30B-A3B-Instruct
+  revision: null                  # PIN ME at deployment
+  max_tokens: 512
+  temperature: 0
+  server_url: http://127.0.0.1:8081/v1
+  request_timeout_s: 300
+  structured_output: true         # vLLM guided decoding handles json_schema;
+                                  # the client falls back automatically if not
+  extra_serve_args:
+    - "--max-model-len"
+    - "16384"
+    - "--gpu-memory-utilization"
+    - "0.90"
+    - "--limit-mm-per-prompt"
+    - "image=2"
+
+review_threshold_default: 0.85
+crop_margin_px: 24
+parallelism: 1
+
+ingest:
+  target_dpi: 200
+  deskew: true
+  denoise: true
+  max_edge_px: 2400
+
+paths:
+  inbox: ./data/inbox
+  work: ./data/work
+  db: ./data/scribe.sqlite
+  exports: ./data/exports
+
+security:
+  assert_offline: true
+  allow_hosts:
+    - 127.0.0.1
+    - localhost
+    # Add the REDCap host here, deliberately, when enabling that export:
+    # - redcap.example.org
+
+redcap:
+  api_url: null                   # e.g. https://redcap.example.org/api/
+  token_env: REDCAP_API_TOKEN
+  record_id_field: record_id
+  overwrite: false
+  field_map: {}                   # scribe field -> REDCap field; empty = same names
+  table_fields_as_json: true
+  skip_unmapped: false

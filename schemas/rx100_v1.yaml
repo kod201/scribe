@@ -1,0 +1,36 @@
+# External-evaluation schema: chaithanyakota/100-handwritten-medical-records
+# (HF, CC-BY-ND-4.0, rev afcca9f). 100 Indian handwritten prescriptions whose
+# ground truth is the medicines list ONLY -- curated by the dataset author,
+# not by us. That independence is the point: our flow-set gold and schema
+# hints co-evolved with the models under test; this gold did not.
+#
+# Comparison note: gold strings are ALL-CAPS "BRAND [STRENGTH] FORM" lines.
+# The eval normalizes case/punctuation, and scripts/eval_rx100.py adds
+# token-set medicine precision/recall so word-order conventions do not
+# masquerade as misreadings.
+
+schema_id: rx100_v1
+version: 1
+description: External handwritten-prescription evaluation (medicines list only).
+
+fields:
+  - name: medicines
+    type: table
+    required: true
+    max_rows: 15
+    locate_hint: >
+      The prescription body: the Rx section listing the prescribed medicines,
+      usually the central handwritten block of the page.
+    extract_hint: >
+      One row per prescribed medicine, in the order written. Transcribe the
+      medicine name exactly as the strokes read, including the strength and
+      form if written (e.g. "DOLO 650MG TAB"). Never correct a spelling
+      toward a drug you expect; brand names here are frequently unfamiliar.
+      Skip non-medicine lines (advice, diagnosis, dates, doctor details).
+      If a line is not legible enough to name, omit the row rather than
+      guessing.
+    columns:
+      - name: medicine
+        type: string
+        max_length: 120
+        extract_hint: "The medicine as written: name, strength, form."

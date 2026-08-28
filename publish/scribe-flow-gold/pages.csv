@@ -1,0 +1,24 @@
+pair_id,file_name,page_type,source,contributor
+AMR_001,images/AMR_001_HTR.png,vitals_chart,amr,Amal Pantami
+AMR_003,images/AMR_003_HTR.png,prescription,amr,Amal Pantami
+AMR_004,images/AMR_004_HTR.png,lab_request,amr,Amal Pantami
+AMR_005,images/AMR_005_HTR.png,vitals_chart,amr,Arnold Kaura
+AMR_006,images/AMR_006_HTR.png,prescription,amr,Arnold Kaura
+AMR_007,images/AMR_007_HTR.png,prescription,amr,Arnold Kaura
+AMR_008,images/AMR_008_HTR.png,vitals_chart,amr,Arnold Kaura
+AMR_009,images/AMR_009_HTR.png,visit_note,amr,Arnold Kaura
+AMR_010,images/AMR_010_HTR.png,lab_request,amr,Arnold Kaura
+AMR_011,images/AMR_011_HTR.png,lab_request,amr,Arnold Kaura
+AMR_012,images/AMR_012_HTR.png,lab_request,amr,Chukwufumnaya Alekwe
+AMR_014,images/AMR_014_HTR.png,prescription,amr,Chukwufumnaya Alekwe
+AMR_015,images/AMR_015_HTR.png,vitals_chart,amr,Chukwufumnaya Alekwe
+AMR_016,images/AMR_016_HTR.png,lab_request,amr,Fatukasi Sarah
+AMR_017,images/AMR_017_HTR.png,vitals_chart,amr,Fatukasi Sarah
+AMR_019,images/AMR_019_HTR.png,prescription,amr,Fatukasi Sarah
+AMR_020,images/AMR_020_HTR.png,visit_note,amr,Isaac Peace
+AMR_021,images/AMR_021_HTR.png,vitals_chart,amr,Isaac Peace
+AMR_022,images/AMR_022_HTR.png,prescription,amr,Isaac Peace
+AMR_023,images/AMR_023_HTR.png,lab_request,amr,Isaac Peace
+SYN_001,images/SYN_001.png,prescription,synthetic,synthetic
+SYN_002,images/SYN_002.png,vitals_chart,synthetic,synthetic
+SYN_003,images/SYN_003.png,lab_request,synthetic,synthetic
