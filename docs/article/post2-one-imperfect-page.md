@@ -44,13 +44,13 @@ I ran both of my best configurations, which differ only in which model does the 
 
 That repeats part 1's central lesson in harsher light: **verification cannot fix reading. It can only catch it.**
 
-No prompt I own fixes the reading either. This is roughly the frontier of what local vision models can do with hard cursive right now — a [recent benchmark on South African maternity records](https://arxiv.org/abs/2604.16504) found the same wall with frontier cloud models.
+No prompt I own fixes the reading either. For the local vision models I tested, hard cursive still looks like a real ceiling — and a [recent benchmark on South African maternity records](https://arxiv.org/abs/2604.16504) ran into a similar wall even with frontier cloud models.
 
 ## But the system knew
 
 Here's the part that mattered to me.
 
-Faced with input it couldn't read, the pipeline didn't pretend. The calibrated confidence — the "if any character is ambiguous, say so" behavior from part 1 — dropped to 0.60–0.70 on almost every page. And **97–99% of pages routed to the human review queue.**
+Faced with input it couldn't read, the pipeline didn't pretend. On these harder pages, the models were much less willing to claim certainty: most confidence scores fell to around 0.60–0.70, and **97–99% of pages were sent for human review.**
 
 For this input, "a person must look at this" *is* the correct output.
 
