@@ -1,4 +1,4 @@
-# What Happened When I Tested Scribe on Unseen Data
+# One Imperfect Page per Hundred: Testing Scribe on Data I Didn't Curate
 
 When I tested my pipeline on data outside its own benchmark, brand-name reading accuracy fell from roughly 80% to **38%**.
 
@@ -40,11 +40,11 @@ Brand names came back right 38% of the time.
 
 These are the same kind of confident misreads that affected patient names in part 1 — at roughly triple the rate, because the handwriting is harder and the vocabulary is unfamiliar.
 
-I ran both of my best configurations, which differ only in which model does the second read. They produced **identical reading results**. Same primary model, same eyes; the verifier only changed how much got flagged.
+I ran both of my best configurations, which differ only in which model does the second read. They produced **identical reading results** — same primary model, so the underlying reading was unchanged; the verifier only affected how much got flagged.
 
 That repeats part 1's central lesson: **verification cannot fix reading. It can only catch it.**
 
-No prompt I own fixes the reading either. For the local vision models I tested, hard cursive remains a real limitation — and a [recent benchmark on South African maternity records](https://arxiv.org/abs/2604.16504) reported similar difficulty even with frontier cloud models.
+No prompt I own fixes the reading either. For the local vision models I tested, hard cursive remains a major limitation — and a [recent benchmark on South African maternity records](https://arxiv.org/abs/2604.16504) reported similar difficulty even with frontier cloud models.
 
 ## The review gate held
 
