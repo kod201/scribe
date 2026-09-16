@@ -1,12 +1,10 @@
 # One Imperfect Page per Hundred: Testing Scribe on Data I Didn't Curate
 
-When I tested my pipeline on data outside its own benchmark, brand-name reading accuracy fell from roughly 80% to **38%**.
+I tested Scribe on 100 handwritten prescriptions with annotations supplied by someone else. I had not used these pages to tune the pipeline.
 
-The share of pages flagged for human review rose from 28% to **97%**.
+With the Qwen verifier, **97 pages were sent for human review**. Of the three accepted automatically, two were correct and one missed a medicine. With the Gemma verifier, 99 pages went to review and the single page accepted automatically was correct.
 
-And exactly **one imperfect page in a hundred** reached the record without a person looking at it.
-
-This post explains why I consider that a reasonable result.
+The review checks limited the number of unreviewed errors, but the pipeline still needed human help on almost every page. This post walks through what the run showed and what it did not establish.
 
 ## Where this started
 
@@ -38,7 +36,7 @@ Brand names came back right 38% of the time.
 
 *CEPODEM* became **Capelin**. *ESOTAB* became **Esotrib**. *NIVEOLI* became **Ulfah Niveoli**.
 
-These are the same kind of confident misreads that affected patient names in part 1 — at roughly triple the rate, because the handwriting is harder and the vocabulary is unfamiliar.
+These are the same kind of confident misreads that affected patient names in part 1, and they happened more often here: the handwriting is harder and the vocabulary is unfamiliar. (The two evaluations use different measures — field-level accuracy on the development set, brand-name recall here — so I'm not putting a before-and-after number on it.)
 
 I ran both of my best configurations, which differ only in which model does the second read. They produced **identical reading results** — same primary model, so the underlying reading was unchanged; the verifier only affected how much got flagged.
 
@@ -56,14 +54,16 @@ For this input, "a person must look at this" *is* the correct output.
 
 ## Auditing the escapes
 
-Three pages out of a hundred skipped human review. I checked every one by hand.
+With the Qwen verifier, three pages out of a hundred skipped human review. I checked each one by hand.
 
-* Two were **fully correct** — single-medicine prescriptions, read cleanly.
-* One was an eleven-medicine page that got ten of them right — and **silently dropped one** (`BETNESOL INJ`).
+* Two were correct — single-medicine prescriptions where the extracted medicine matched the annotation.
+* One was an eleven-medicine page that got ten of them right and **dropped one** (`BETNESOL INJ`).
 
-One imperfect page per hundred, on input considerably harder than anything in the development set.
+So the imperfect page is one out of 100 pages tested — but also one out of only three pages accepted without review. Those two denominators tell different stories. The result shows the pipeline routed almost everything to a person; it does not demonstrate high accuracy among automatically accepted pages, because there were too few of them to say.
 
-Part 1 ended with a rule: *count what escapes, and you're grading the system.* This test is why that rule exists — it's what lets me report a specific audited failure count instead of a single accuracy number.
+With the Gemma verifier, one page was accepted automatically, and it was correct.
+
+Part 1 ended with a rule: *count what escapes, and you're grading the system.* This is what that looks like in practice — a specific, audited count of unreviewed errors rather than a single accuracy number.
 
 ## The test also caught a bug in my scorer
 
@@ -74,7 +74,7 @@ My first scoring pass penalized extracted rows for containing dose schedules lik
 ## What I'm taking away
 
 * **Reading accuracy didn't transfer to new handwriting; the review-gate behavior did.** The parts that held up were the system parts — confidence behavior, dual reads, the review queue. The reading itself did not.
-* **My production target got context.** Part 1's benchmark sits at 96% trusted-output accuracy; this set is too far from my actual target forms to measure the 98% goal against. The real number will land somewhere between the two, and only the held-out set will say where.
+* **Neither evaluation establishes performance on the intended target forms.** Part 1's benchmark is public data; this set is a different form type from a different country. The private held-out evaluation is what will measure the 98% target.
 * **A high flag rate is not failure here.** Flagging 97% of pages the models genuinely couldn't read is correct behavior. The bad outcome would have been a normal flag rate with wrong drug names passing through unreviewed.
 
 ## What's next
@@ -95,7 +95,7 @@ Both finalist configurations (same Qwen3.8-27B primary; Qwen3-VL-8B vs Gemma-3-1
 | Brand-name recall | 38% (136/359) | 38% |
 | Page flag rate | 97% | 99% |
 
-Token matching uses 60% gold-token coverage so word-order conventions don't count as misreads. Full scoring code: [`scripts/eval_rx100.py`](https://github.com/kod201/scribe/blob/main/scripts/eval_rx100.py).
+Two definitions of "correct" appear in this post, and they differ on purpose. *Strict page-level exact* requires every extracted medicine to match the annotation's wording and order — so an extraction of "Drop VITAMIN D3 800 IU/ML (Depura)" fails against the annotation "DEPURA" even though it's the same medicine. The hand audit of auto-accepted pages, and the token-match metric, count a medicine as found when the brand name matches (60% gold-token coverage), which is why the audit reports pages as correct that the strict metric does not. Full scoring code: [`scripts/eval_rx100.py`](https://github.com/kod201/scribe/blob/main/scripts/eval_rx100.py).
 
 Dataset: [100-handwritten-medical-records](https://huggingface.co/datasets/chaithanyakota/100-handwritten-medical-records) (CC-BY-ND-4.0), evaluated as-is and not redistributed.
 

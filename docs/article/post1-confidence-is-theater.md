@@ -17,7 +17,7 @@ Median confidence when the answer was wrong: **0.95**.
 
 So confidence wasn't giving me a useful signal.
 
-That sent the project in a different direction: instead of asking a model whether I should trust it, I started making two reads disagree with each other.
+That sent the project in a different direction: instead of asking a model whether I should trust it, I started comparing two independent reads of each field and treating disagreement as the signal to send it to a person.
 
 This is the engineering log of what happened next.
 
@@ -70,27 +70,7 @@ That hybrid approach beat both pure modes on the combined quality measures and b
 
 ## 2. Confidence didn't work
 
-The next problem was deciding which extracted values could safely skip human review.
-
-Originally, I planned to use the model's own confidence score.
-
-That sounded reasonable.
-
-It wasn't.
-
-The median confidence was 0.95 for correct answers and 0.95 for wrong ones. Even badly misread handwritten names could come back with very high confidence.
-
-There was no useful threshold to tune.
-
-So I changed the question.
-
-Instead of asking:
-
-*"How sure are you?"*
-
-I asked:
-
-*"Does another read agree?"*
+The next problem was deciding which extracted values could safely skip human review. I initially planned to use the model's own confidence score for this, but as the opening numbers showed, confidence did not separate correct answers from mistakes on this test: even badly misread handwritten names came back at 0.95, and there was no threshold worth tuning. So instead of asking the model how sure it was, I tried reading each field a second time and flagging the ones where the two reads disagreed.
 
 ## 3. A second read helped much more than confidence
 
