@@ -1,4 +1,4 @@
-# One Imperfect Page per Hundred: Testing Scribe on Data I Didn't Curate
+# What Happened When I Tested Scribe on Unseen Data
 
 When I tested my pipeline on data outside its own benchmark, brand-name reading accuracy fell from roughly 80% to **38%**.
 
@@ -44,7 +44,7 @@ I ran both of my best configurations, which differ only in which model does the 
 
 That repeats part 1's central lesson: **verification cannot fix reading. It can only catch it.**
 
-No prompt I own fixes the reading either. For the local vision models I tested, hard cursive still looks like a real ceiling — and a [recent benchmark on South African maternity records](https://arxiv.org/abs/2604.16504) ran into a similar wall even with frontier cloud models.
+No prompt I own fixes the reading either. For the local vision models I tested, hard cursive remains a real limitation — and a [recent benchmark on South African maternity records](https://arxiv.org/abs/2604.16504) reported similar difficulty even with frontier cloud models.
 
 ## The review gate held
 
@@ -81,7 +81,7 @@ My first scoring pass penalized extracted rows for containing dose schedules lik
 
 The held-out evaluation: real target-form registers, hand-filled, photographed, never published, created after every model's training cutoff. Those are the numbers that will actually count, and they'll be part 3 of this series.
 
-And the checkbox problem from part 1 still needs its own detection stage, likely powered by the one model I found that refuses to invent.
+And the checkbox problem from part 1 still needs its own detection stage, likely using the one model in my tests that produced no hallucinated values.
 
 <details>
 <summary><strong>The numbers, for engineers</strong> (click to expand)</summary>

@@ -169,7 +169,7 @@ The remaining gains were more likely to come from:
 * explicit checkbox detection
 * resolving a few annotation conventions
 
-So I stopped verifier shopping.
+So I stopped testing new verifiers.
 
 ## 7. The metric I care about changed too
 
@@ -192,7 +192,7 @@ If you only measure raw hallucination, you are grading the model.
 
 If you measure what survives validation, verification and review, you are grading the system.
 
-And the system is what actually ships.
+And the system is what actually goes into production.
 
 ## Where the bench ended up
 
@@ -266,7 +266,7 @@ Hardware, pinned model revisions, per-field tables, metric definitions and one d
 
 ---
 
-**This is part 1 of a series.** Part 2: [*One imperfect page per hundred*](https://dev.to/sohakanu/one-imperfect-page-per-hundred-ambushing-our-pipeline-with-data-nobody-tuned-fh8) — the external evaluation on data nobody tuned against.
+**This is part 1 of a series.** Part 2: [*One imperfect page per hundred*](https://dev.to/sohakanu/one-imperfect-page-per-hundred-ambushing-our-pipeline-with-data-nobody-tuned-fh8) — testing Scribe on an external prescription dataset.
 
 Code and methodology: [github.com/kod201/scribe](https://github.com/kod201/scribe) · Benchmark gold set: [sohakanu/scribe-flow-gold](https://huggingface.co/datasets/sohakanu/scribe-flow-gold)
 
