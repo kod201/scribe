@@ -214,7 +214,7 @@ There are still three important open questions.
 
 **Production targets.** The target is at least 98% accuracy on automatically accepted fields and no more than 2% escaped hallucination, measured only on the private held-out set.
 
-**Generalization.** This one already has a first answer: in [part 2 of this series](https://dev.to/sohakanu/one-imperfect-page-per-hundred-ambushing-our-pipeline-with-data-nobody-tuned-fh8), I ran the two best configurations against 100 independently labeled handwritten prescription pages that nobody tuned for. Reading collapsed. Something more interesting held.
+**Generalization.** This one already has a first answer: in [part 2 of this series](https://dev.to/sohakanu/one-imperfect-page-per-hundred-ambushing-our-pipeline-with-data-nobody-tuned-fh8), I ran the two best configurations against 100 independently labeled handwritten prescription pages I had no hand in. Reading accuracy dropped sharply; the review system held.
 
 So the next useful number should come from genuinely unseen data, not from squeezing another decimal point out of this development set.
 

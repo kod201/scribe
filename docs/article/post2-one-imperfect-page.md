@@ -1,24 +1,24 @@
-# One Imperfect Page per Hundred: I Ambushed My Pipeline with Data Nobody Tuned For
+# One Imperfect Page per Hundred: Testing Scribe on Data I Didn't Curate
 
-When I moved my pipeline off its own benchmark, brand-name reading accuracy fell from roughly 80% to **38%**.
+When I tested my pipeline on data outside its own benchmark, brand-name reading accuracy fell from roughly 80% to **38%**.
 
 The share of pages flagged for human review rose from 28% to **97%**.
 
 And exactly **one imperfect page in a hundred** reached the record without a person looking at it.
 
-This post is about why I count that as a pass.
+This post explains why I consider that a reasonable result.
 
 ## Where this started
 
 In [part 1](https://dev.to/sohakanu/confidence-is-theater-benchmarking-nine-local-vlm-pipelines-on-handwritten-clinical-forms-38h6), I built Scribe — a local pipeline that turns handwritten clinical forms into structured data and, more importantly, learned when *not* to trust a model's answer. The headline was that model confidence carried no signal, and disagreement between two independent reads did.
 
-But every number in part 1 had a quiet weakness.
+But every number in part 1 had a limitation.
 
-I curated the gold answers. I wrote the extraction schema. I tuned the prompts against the same 23 pages I was scoring on. Even honestly done, that's a loop — the system and its examiner grew up together.
+I curated the gold answers. I wrote the extraction schema. I tuned the prompts against the same 23 pages I was scoring on. Even done carefully, that means the system and the test were developed together.
 
-So I went looking for an exam nobody in the room had written.
+So I wanted a test set I had no hand in.
 
-## The ambush
+## The external test
 
 I found a [public dataset of 100 handwritten Indian prescriptions](https://huggingface.co/datasets/chaithanyakota/100-handwritten-medical-records), where the ground truth — the list of medicines on each page — was written by the dataset's author, not by me.
 
@@ -28,29 +28,29 @@ The rules I set for myself:
 * the prompts stay frozen exactly as they were in part 1
 * the author's answer conventions are the answer key, not mine
 
-Two things make this set genuinely hostile. The handwriting is real doctors' cursive — not the careful volunteer writing my benchmark was built from. And the drug names are Indian brand names the models have little prior for.
+Two things make this set difficult. The handwriting is real doctors' cursive — not the careful volunteer writing my benchmark was built from. And the drug names are Indian brand names the models have seen little of.
 
-Which is the point. A system built for clinics in one country will eventually meet a register from another.
+That difficulty is useful: a system built for clinics in one country will eventually meet forms from another.
 
-## The reading collapsed
+## Reading accuracy dropped sharply
 
 Brand names came back right 38% of the time.
 
 *CEPODEM* became **Capelin**. *ESOTAB* became **Esotrib**. *NIVEOLI* became **Ulfah Niveoli**.
 
-These are the same confident-cursive misreads that plagued patient names in part 1 — at triple the rate, because the handwriting is harder and the vocabulary is foreign.
+These are the same kind of confident misreads that affected patient names in part 1 — at roughly triple the rate, because the handwriting is harder and the vocabulary is unfamiliar.
 
 I ran both of my best configurations, which differ only in which model does the second read. They produced **identical reading results**. Same primary model, same eyes; the verifier only changed how much got flagged.
 
-That repeats part 1's central lesson in harsher light: **verification cannot fix reading. It can only catch it.**
+That repeats part 1's central lesson: **verification cannot fix reading. It can only catch it.**
 
 No prompt I own fixes the reading either. For the local vision models I tested, hard cursive still looks like a real ceiling — and a [recent benchmark on South African maternity records](https://arxiv.org/abs/2604.16504) ran into a similar wall even with frontier cloud models.
 
-## But the system knew
+## The review gate held
 
-Here's the part that mattered to me.
+This is the part that mattered to me.
 
-Faced with input it couldn't read, the pipeline didn't pretend. On these harder pages, the models were much less willing to claim certainty: most confidence scores fell to around 0.60–0.70, and **97–99% of pages were sent for human review.**
+On these harder pages, the models were much less willing to claim certainty: most confidence scores fell to around 0.60–0.70, and **97–99% of pages were sent for human review.**
 
 For this input, "a person must look at this" *is* the correct output.
 
@@ -61,25 +61,25 @@ Three pages out of a hundred skipped human review. I checked every one by hand.
 * Two were **fully correct** — single-medicine prescriptions, read cleanly.
 * One was an eleven-medicine page that got ten of them right — and **silently dropped one** (`BETNESOL INJ`).
 
-One imperfect page per hundred, on the hardest input this system has ever seen, under total distribution shift.
+One imperfect page per hundred, on input considerably harder than anything in the development set.
 
-Part 1 ended with a rule: *count what escapes, and you're grading the system.* This was the rule's first live test, and it's the only reason I can write a sentence as precise as the one above instead of waving at an accuracy number.
+Part 1 ended with a rule: *count what escapes, and you're grading the system.* This test is why that rule exists — it's what lets me report a specific audited failure count instead of a single accuracy number.
 
-## The exam graded my grader too
+## The test also caught a bug in my scorer
 
-One more thing the ambush caught — in my own tooling.
+One more thing this exercise caught — in my own tooling.
 
 My first scoring pass penalized extracted rows for containing dose schedules like `(1-0-1)`, even when they named the right drug. The scorer's precision check compared token sets in the wrong direction. External data debugs your evaluator, not just your model.
 
 ## What I'm taking away
 
-* **Reading skill doesn't travel; gate discipline does.** Every investment that held up under distribution shift was in the *system* — calibration, dual reads, the review queue. Everything invested in squeezing the reader stayed home.
-* **My production target got context.** Part 1's benchmark sits at 96% trusted-output accuracy; this hostile set is unmeasurable against the 98% target. The real number for my actual target forms will land somewhere between the friendly bench and this ambush — and only the held-out set will say where.
-* **A high flag rate is not failure.** 97% flags on unreadable input is the system telling the truth. The failure mode would have been 28% flags and a queue full of *Capelin*.
+* **Reading accuracy didn't transfer to new handwriting; the review-gate behavior did.** The parts that held up were the system parts — confidence behavior, dual reads, the review queue. The reading itself did not.
+* **My production target got context.** Part 1's benchmark sits at 96% trusted-output accuracy; this set is too far from my actual target forms to measure the 98% goal against. The real number will land somewhere between the two, and only the held-out set will say where.
+* **A high flag rate is not failure here.** Flagging 97% of pages the models genuinely couldn't read is correct behavior. The bad outcome would have been a normal flag rate with wrong drug names passing through unreviewed.
 
 ## What's next
 
-The held-out evaluation: real target-form registers, hand-filled, photographed, never published, created after every model's training cutoff. That produces the only numbers I'll stand behind — and it's part 3 of this series.
+The held-out evaluation: real target-form registers, hand-filled, photographed, never published, created after every model's training cutoff. Those are the numbers that will actually count, and they'll be part 3 of this series.
 
 And the checkbox problem from part 1 still needs its own detection stage, likely powered by the one model I found that refuses to invent.
 
