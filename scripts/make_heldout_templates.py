@@ -3,9 +3,9 @@
 Generates A4 300-DPI blanks for the four amr_flow_v1 page types as one PDF:
 print, hand-fill with FABRICATED data, photograph, transcribe.
 
-These are generic stand-ins. If the real study CRFs or Zambia MoH / WHO
-register layouts are available, print those instead -- the held-out set should
-look like the forms the pipeline will actually face.
+These are generic stand-ins. If the real target form layouts are available,
+print those instead -- the held-out set should look like the forms the pipeline
+will actually face.
 
     uv run python scripts/make_heldout_templates.py
 """
